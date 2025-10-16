@@ -225,12 +225,20 @@ export default function LoginPage() {
               Login with Discord
             </Button>
 
-            <p
-              className="text-xs text-[#F4E8DC]/70 mt-4"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
-            >
-              We do not store your personal data. Verification is limited to confirming your WoW holder role.
-            </p>
+            <div className="space-y-2">
+              <p
+                className="text-xs text-[#F4E8DC]/80 mt-4"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                💡 For the best experience, log in using your main browser where you're already signed into Discord.
+              </p>
+              <p
+                className="text-xs text-[#F4E8DC]/70"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                We do not store your personal data. Verification is limited to confirming your WoW holder role.
+              </p>
+            </div>
           </div>
         </Card>
       </div>
