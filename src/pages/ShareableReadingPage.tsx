@@ -123,7 +123,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
 
     setTimeout(() => {
       initializeReading();
-    }, 1500);
+    }, 2500);
   }, [name, birthDate, userData.focusArea]);
 
   const handleNameToggle = () => {
@@ -376,17 +376,46 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   if (loading) {
     return (
       <div className="min-h-screen gradient-bg flex flex-col items-center justify-center p-5">
+        {/* Fortune Teller Image */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, y: 20 }}
+          animate={{
+            scale: 1,
+            opacity: 1,
+            y: [0, -8, 0],
+          }}
+          transition={{
+            scale: { duration: 0.6 },
+            opacity: { duration: 0.6 },
+            y: {
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }
+          }}
+          className="mb-6"
+        >
+          <img
+            src="/fortune-teller-1.png"
+            alt="Fortune Teller"
+            className="w-32 h-32 object-contain drop-shadow-[0_0_25px_rgba(248,161,209,0.5)]"
+          />
+        </motion.div>
+
+        {/* Spinning Loader */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Loader2 className="w-16 h-16 text-[#9B8DE3] animate-spin" />
         </motion.div>
+
+        {/* Loading Text */}
         <motion.h6
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.5 }}
           className="text-[#F4E8DC] mt-4 text-xl"
           style={{ fontFamily: "'Cinzel', serif" }}
         >

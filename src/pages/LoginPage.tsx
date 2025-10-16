@@ -1,9 +1,27 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getDiscordAuthUrl } from '@/config/discord';
 // import { NumerologyLogo } from '@/components/NumerologyLogo';
 
+const FORTUNE_TELLER_GREETINGS = [
+  "I've been expecting you...",
+  "The stars whisper your arrival.",
+  "Every soul must walk its path — yours begins here.",
+  "Your cosmic journey awaits beyond this threshold.",
+  "The universe has guided you to this moment."
+];
+
 export default function LoginPage() {
+  const [greeting, setGreeting] = useState('');
+
+  useEffect(() => {
+    // Select random greeting on mount
+    const randomGreeting = FORTUNE_TELLER_GREETINGS[Math.floor(Math.random() * FORTUNE_TELLER_GREETINGS.length)];
+    setGreeting(randomGreeting);
+  }, []);
+
   const handleDiscordLogin = () => {
     // Redirect to Discord OAuth2 authorization
     window.location.href = getDiscordAuthUrl();
@@ -83,7 +101,7 @@ export default function LoginPage() {
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12">
         {/* Hero Section */}
-        <div className="text-center mb-12 space-y-6 max-w-3xl">
+        <div className="text-center mb-12 space-y-3 max-w-3xl">
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <img src="/logo_transp.png" alt="The Infinity Compass" className="h-44 w-auto" />
@@ -133,6 +151,35 @@ export default function LoginPage() {
             "Discover your numerology blueprint in harmony with your World of Women energy."
           </p>
         </div>
+
+        {/* Fortune Teller Guide */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mb-8 flex flex-col items-center"
+        >
+          <motion.img
+            src="/fortune-teller-1.png"
+            alt="Fortune Teller"
+            animate={{ y: [0, -6, 0] }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="w-28 h-28 object-contain drop-shadow-[0_0_20px_rgba(248,161,209,0.4)] mb-3"
+          />
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="text-[#F4E8DC]/80 italic text-base md:text-lg"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
+            {greeting}
+          </motion.p>
+        </motion.div>
 
         {/* Login Card */}
         <Card className="glass-effect mystical-glow w-full max-w-md p-8 space-y-6 bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-[#9B8DE3]/40">
