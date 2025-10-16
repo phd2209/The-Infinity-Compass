@@ -16,7 +16,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { NFTSelector } from '@/components/NFTSelector';
 import { useAuth } from '@/context/AuthContext';
 import { fetchUserWoWNFTs } from '@/services/nft';
-import type { NFT } from '@/types/nft';
 
 const formSchema = z.object({
   name: z.string()
@@ -44,7 +43,7 @@ interface IndividualReadingPageProps {
 }
 
 export default function IndividualReadingPage({ onUnLock }: IndividualReadingPageProps) {
-  const { discordUser, wowNFTs, selectedNFT, setWowNFTs, setSelectedNFT } = useAuth();
+  const { wowNFTs, selectedNFT, setWowNFTs, setSelectedNFT } = useAuth();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');

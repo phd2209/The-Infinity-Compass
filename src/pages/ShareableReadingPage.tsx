@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram } from 'lucide-react';
 import { calculateNumerologyData, type NumerologyData } from '@/utils/numerology';
-import { generateNumerologySummary, type AISummary } from '@/services/AiService';
+import { generateNumerologySummary, type AISummary } from '@/services/aiService';
 import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas-pro';
 
@@ -634,7 +634,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                   </h4>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {aiSummary.highlightWords.map((word, idx) => (
+                  {aiSummary.highlightWords.map((word: string, idx: number) => (
                     <motion.span
                       key={idx}
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -656,7 +656,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                 transition={{ delay: 1.2 }}
                 className="flex gap-3"
               >
-                {aiSummary.visualCue.map((emoji, idx) => (
+                {aiSummary.visualCue.map((emoji: string, idx: number) => (
                   <span
                     key={idx}
                     className="text-3xl"
