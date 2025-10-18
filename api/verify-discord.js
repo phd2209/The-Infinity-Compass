@@ -58,10 +58,18 @@ export default async function handler(req, res) {
 
     if (cachedVerification) {
       console.log('Cache hit for Discord verification:', user.id);
-      return res.status(200).json({
-        ...cachedVerification,
-        cached: true,
+
+      // Redirect to frontend with cached verification result
+      const frontendCallbackUrl = process.env.FRONTEND_CALLBACK_URL || 'http://localhost:3001/auth/callback';
+      const params = new URLSearchParams({
+        verified: cachedVerification.verified.toString(),
+        discordId: cachedVerification.discordId,
+        username: cachedVerification.globalName || cachedVerification.username,
+        state: state || '',
+        cached: 'true',
       });
+
+      return res.redirect(302, `${frontendCallbackUrl}?${params.toString()}`);
     }
 
     // Step 3: Verify user has required role
