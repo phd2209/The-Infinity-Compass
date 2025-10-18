@@ -296,7 +296,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   };
 
   const handleShareToX = async () => {
-    const shareText = `My numerology reading aligned with my World of Women spirit ✨\n\nDiscover yours at sacrednumerology.com`;
+    const shareText = `"${aiSummary?.oneLiner || 'Discover your cosmic blueprint'}" — My Infinity Compass reading ✨\n\nExplore your cosmic blueprint at https://infinitycompass.xyz`;
 
     // Only use Web Share API on mobile devices (not desktop)
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -376,8 +376,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
       try {
         await navigator.share({
           files: [new File([blob], 'reading.png', { type: 'image/png' })],
-          title: 'My Numerology Reading',
-          text: 'My numerology reading aligned with my World of Women spirit ✨'
+          title: 'My Infinity Compass Reading',
+          text: `"${aiSummary?.oneLiner || 'Discover your cosmic blueprint'}" — My Infinity Compass reading ✨`
         });
       } catch (error) {
         console.log('Share cancelled or failed');
