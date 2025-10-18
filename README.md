@@ -551,3 +551,240 @@ For issues or questions:
 <div align="center">
   Made with cosmic energy ✨
 </div>
+
+
+## Info Page
+
+# 🌙 About The Fortune Teller
+
+Welcome, traveler — before you step through the portal, let’s align your energy with the stars.
+
+---
+
+## 🔢 The Wisdom of Numerology
+The **Fortune Teller** draws inspiration from *Cheiro’s Numerology*, a system that connects the vibrations of numbers to personality, destiny, and life purpose.  
+In this philosophy, every number carries a hidden rhythm — revealing how we move through the world and how the universe responds in kind.
+
+Each reading is guided by these ancient principles, blending mathematics with mysticism to illuminate your unique path.
+
+---
+
+## ✨ Your Name and Your Ground Energy
+To open your portal, you’ll be asked for two key elements:
+
+- **Your Name** — the vibration that shapes your *Life Path*, reflecting your purpose and outward expression.  
+- **Your Birthday** — your *Ground Energy*, anchoring your journey and revealing the core rhythm of your soul.
+
+These details are used **only to calculate your numerological signature** — nothing is stored, shared, or linked to your Discord or wallet.  
+They serve purely to align your personal energy with your chosen NFT’s cosmic frequency.
+
+---
+
+## 🪄 Why Discord Login?
+We use **Discord authentication** to recognize verified **World of Women** and **World of Women Galaxy** holders —  
+a seamless way to confirm community membership **without requiring a wallet connection**.  
+Your privacy remains fully protected; the app receives only your Discord ID and username.
+
+---
+
+## 💫 Merging Your Energy with Your NFT
+Your **WoW or WoWG NFT** acts as a cosmic mirror — a reflection of grace, color, and energy.  
+By merging your numerological profile with your NFT, the Fortune Teller reveals how your personal essence and your artwork’s aura harmonize.  
+Together, they form a portrait of your creative and spiritual alignment — a fusion of art, soul, and symbolism.
+
+---
+
+## 🌕 Questions or Thoughts?
+If you have any questions or insights to share, the Fortune Teller welcomes your message.  
+Reach out in the **#fortune-teller** channel on Discord — or send a DM to **@InfinityCompass** on X.  
+Your journey is uniquely yours — but the stars love curious minds.
+
+---
+
+> *“Numbers are the language of fate — and art, its most beautiful accent.”*  
+> — The Fortune Teller 🔮
+
+
+Visual & UX Design Spec
+
+Goal: keep page visually and emotionally consistent with the rest of the app (Indigo → Coral gradient palette, glassmorphism cards, soft glow accents). The Fortune Teller and the Infinity Compass logo should appear, but the page must not interrupt the login flow — it’s informational and optional.
+
+Layout (desktop)
+
+Header (small): left-aligned Infinity Compass logo (svg) + top-right “Close / Back to Portal” button.
+
+Hero section (centered):
+
+Left: Fortune Teller portrait (rounded, subtle glow) — optional small caption “The Fortune Teller”.
+
+Right: Title + intro line (the first line of copy).
+
+Content area below hero: 2-column glassmorphism card
+
+Column A: left column block contains the numerology explanation + name/birthday section
+
+Column B: right column block contains Discord login explanation + merging NFT explanation + contact block
+
+Footer: subtle gradient footer with small tagline and link back to /login.
+
+Layout (mobile)
+
+Single column: top logo, hero image, title, then the sections stacked.
+
+Keep Fortune Teller smaller and centered above the copy.
+
+CTA (“Back to Portal”) at bottom as sticky button.
+
+Visual treatments
+
+Background: same as app — Cosmic Black → Midnight Indigo gradient.
+
+Card: glassmorphism panel: backdrop-filter: blur(8px); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06)
+
+Accent color: Celestial Violet → Solar Coral gradient for buttons and small heading markers.
+
+Fonts: Title Playfair Display (or similar elegant serif). Body Inter or Poppins.
+
+Imagery
+
+Use the fortune_teller.webp (transparent) on the hero; add a soft halo glow (CSS drop-shadow).
+
+Place the logo_transp.png (Infinity Compass) in the header, small and left aligned.
+
+🧩 Component Breakdown (React / Vite)
+
+Suggested file structure:
+
+src/
+ ├─ pages/
+ │   └─ InfoPage.jsx
+ ├─ components/
+ │   ├─ InfoHero.jsx
+ │   ├─ InfoCard.jsx
+ │   ├─ LogoSmall.jsx
+ │   └─ FortuneTellerPortrait.jsx
+ ├─ assets/
+ │   ├─ fortune_teller.webp
+ │   └─ logo_transp.png
+
+Suggested React components
+LogoSmall.jsx
+
+Small SVG / PNG logo with alt="Infinity Compass logo".
+
+Props: size, className.
+
+FortuneTellerPortrait.jsx
+
+Renders the fortune teller image with halo and optional animation.
+
+Props: size="md|lg", ariaLabel.
+
+InfoHero.jsx
+
+Layout for hero area: left portrait + right title/lead copy.
+
+Takes title, leadText.
+
+InfoCard.jsx
+
+Reusable glassmorphism card component to hold sections (numerology, privacy, discord, NFT merge, contact).
+
+Accessibility: role="region", aria-labelledby.
+
+InfoPage.jsx
+
+Page wrapper that composes the above components and contains the full approved copy.
+
+💻 Example React + Tailwind snippets
+
+These are tiny templates to implement quickly. Adapt class names to your project.
+
+InfoPage.jsx
+
+import LogoSmall from '@/components/LogoSmall';
+import FortuneTellerPortrait from '@/components/FortuneTellerPortrait';
+import InfoCard from '@/components/InfoCard';
+
+export default function InfoPage() {
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-[#0C0A1E] to-[#1D1B3A] text-ivory p-6">
+      <header className="max-w-6xl mx-auto flex items-center justify-between py-6">
+        <LogoSmall className="w-28" />
+        <a href="/login" className="text-sm px-4 py-2 rounded-md bg-gradient-to-r from-[#9B8DE3] to-[#FF8674] text-white">Back to portal</a>
+      </header>
+
+      <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center py-8">
+        <div className="flex justify-center md:justify-end">
+          <FortuneTellerPortrait size="lg" />
+        </div>
+
+        <div>
+          <h1 className="text-4xl font-serif text-ivory mb-2">About The Fortune Teller</h1>
+          <p className="text-indigo-100 max-w-xl">
+            Welcome, traveler — before you step through the portal, let’s align your energy with the stars.
+          </p>
+        </div>
+      </section>
+
+      <section className="max-w-5xl mx-auto grid gap-6">
+        <InfoCard title="The Wisdom of Numerology">
+          {/* paste section copy content here */}
+        </InfoCard>
+        <InfoCard title="Your Name and Your Ground Energy">
+          {/* paste section copy here */}
+        </InfoCard>
+        <InfoCard title="Why Discord Login?">
+          {/* paste section copy here */}
+        </InfoCard>
+        <InfoCard title="Merging Your Energy with Your NFT">
+          {/* paste section copy here */}
+        </InfoCard>
+        <InfoCard title="Questions or Thoughts?">
+          {/* paste contact copy here */}
+        </InfoCard>
+      </section>
+
+      <footer className="max-w-6xl mx-auto text-center py-10 text-sm text-indigo-300">
+        “Numbers are the language of fate — and art, its most beautiful accent.” — The Fortune Teller
+      </footer>
+    </main>
+  );
+}
+
+
+InfoCard.jsx
+
+export default function InfoCard({ title, children }) {
+  return (
+    <article role="region" aria-labelledby={title.replace(/\s+/g, '-').toLowerCase()} className="p-6 rounded-2xl bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.04)] backdrop-blur-sm">
+      <h2 id={title.replace(/\s+/g, '-').toLowerCase()} className="text-xl font-semibold text-ivory mb-2">{title}</h2>
+      <div className="text-indigo-100 text-sm">{children}</div>
+    </article>
+  );
+}
+
+
+FortuneTellerPortrait.jsx
+
+export default function FortuneTellerPortrait({ size='md', ariaLabel='Fortune Teller portrait' }) {
+  const dims = size === 'lg' ? 'w-72' : 'w-48';
+  return (
+    <div className={`relative ${dims}`}>
+      <img src="/assets/fortune_teller.webp" alt={ariaLabel} className={`${dims} rounded-full shadow-2xl`} />
+      <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px rgba(155,141,227,0.25)' }} />
+    </div>
+  );
+}
+
+♿ Accessibility & Privacy Notes
+
+Use semantic headings (h1 → h2 → h3) and role="region" with aria-labelledby on content cards.
+
+Provide alt text for logo and portrait: e.g., alt="The Fortune Teller — World of Women NFT portrait".
+
+High contrast: ensure text over gradients meets AA contrast (use Ivory #F4E8DC for main text).
+
+Privacy wording: keep the explicit statement that name + birthday are used only for numerology computation and are not stored. If you do store any reading for caching, note that in the privacy copy (transparency).
+
+Provide a link to a fuller privacy policy in the footer (or a modal) if you plan to persist readings server-side.

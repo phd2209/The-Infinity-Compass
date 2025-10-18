@@ -7,6 +7,7 @@ import IndividualReadingPage from './pages/IndividualReadingPage';
 import ReadingPage from './pages/ReadingPage';
 import ShareableReadingPage from './pages/ShareableReadingPage';
 import NumerologyTestPage from './pages/NumerologyTestPage';
+import InfoPage from './pages/InfoPage';
 
 interface UserData {
   name: string;
@@ -75,6 +76,9 @@ function AppRoutes() {
             )
           }
         />
+
+        {/* Info page - accessible to all */}
+        <Route path="/info" element={<InfoPage />} />
 
         {/* Test page - accessible without authentication */}
         <Route path="/test" element={<NumerologyTestPage />} />

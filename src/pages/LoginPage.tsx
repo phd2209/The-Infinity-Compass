@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getDiscordAuthUrl } from '@/config/discord';
@@ -14,6 +16,7 @@ const FORTUNE_TELLER_GREETINGS = [
 ];
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
@@ -181,8 +184,17 @@ export default function LoginPage() {
           </motion.p>
         </motion.div>
 
-        {/* Login Card */}
-        <Card className="glass-effect mystical-glow w-full max-w-md p-8 space-y-6 bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-[#9B8DE3]/40">
+        {/* Login Card with Info Button */}
+        <Card className="glass-effect mystical-glow w-full max-w-md p-8 space-y-6 bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-[#9B8DE3]/40 relative">
+          {/* Subtle Info Button - Inside card at top-right */}
+          <button
+            onClick={() => navigate('/info')}
+            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#1D1B3A]/60 backdrop-blur-sm border border-[#9B8DE3]/30 hover:border-[#F8A1D1]/60 hover:bg-[#1D1B3A]/80 transition-all duration-300 flex items-center justify-center group hover:shadow-[0_0_20px_rgba(155,141,227,0.3)] cursor-pointer"
+            aria-label="Learn more about The Fortune Teller"
+          >
+            <HelpCircle className="w-4 h-4 text-[#9B8DE3]/70 group-hover:text-[#F8A1D1] transition-colors" />
+          </button>
+
           <div className="text-center space-y-4">
             {/* Discord logo */}
             <div className="flex justify-center mb-4">
