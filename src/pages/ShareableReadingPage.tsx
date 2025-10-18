@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram } from 'lucide-react';
+import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star } from 'lucide-react';
 import { calculateNumerologyData, type NumerologyData } from '@/utils/numerology';
 import { generateNumerologySummary, type AISummary } from '@/services/aiService';
 import { useAuth } from '@/context/AuthContext';
@@ -46,10 +46,32 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   const [includeName, setIncludeName] = useState(() => {
     return localStorage.getItem('includeNameInReading') === 'true';
   });
+  const [showDeepDive, setShowDeepDive] = useState(false);
+  const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const initializationKey = useRef<string>('');
 
   const { name, birthDate } = userData;
+
+  // Loading text messages that cycle
+  const loadingMessages = [
+    "Crafting your cosmic story...",
+    "Consulting the stars...",
+    "Reading the celestial patterns...",
+    "Unveiling your sacred numbers...",
+    "Channeling cosmic wisdom..."
+  ];
+
+  // Cycle through loading messages
+  useEffect(() => {
+    if (!loading) return;
+
+    const interval = setInterval(() => {
+      setLoadingTextIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000); // Change message every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [loading, loadingMessages.length]);
 
   // Get archetype title from AI summary with safety truncation
   const getArchetypeTitle = (): string => {
@@ -376,13 +398,13 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   if (loading) {
     return (
       <div className="min-h-screen gradient-bg flex flex-col items-center justify-center p-5">
-        {/* Fortune Teller Image */}
+        {/* Fortune Teller Image - Larger and more prominent */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0, y: 20 }}
           animate={{
             scale: 1,
             opacity: 1,
-            y: [0, -8, 0],
+            y: [0, -12, 0],
           }}
           transition={{
             scale: { duration: 0.6 },
@@ -393,34 +415,45 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
               ease: "easeInOut"
             }
           }}
-          className="mb-6"
+          className="mb-8"
         >
           <img
             src="/fortune-teller-1.png"
             alt="Fortune Teller"
-            className="w-32 h-32 object-contain drop-shadow-[0_0_25px_rgba(248,161,209,0.5)]"
+            className="w-48 h-48 sm:w-56 sm:h-56 object-contain drop-shadow-[0_0_35px_rgba(248,161,209,0.6)]"
           />
         </motion.div>
 
-        {/* Spinning Loader */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Loader2 className="w-16 h-16 text-[#9B8DE3] animate-spin" />
-        </motion.div>
+        {/* Animated Loading Text */}
+        <AnimatePresence mode="wait">
+          <motion.h6
+            key={loadingTextIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+            className="text-[#F4E8DC] text-xl sm:text-2xl text-center px-4"
+            style={{ fontFamily: "'Cinzel', serif" }}
+          >
+            {loadingMessages[loadingTextIndex]}
+          </motion.h6>
+        </AnimatePresence>
 
-        {/* Loading Text */}
-        <motion.h6
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="text-[#F4E8DC] mt-4 text-xl"
-          style={{ fontFamily: "'Cinzel', serif" }}
+        {/* Subtle sparkle effect */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="mt-6 flex gap-2"
         >
-          Crafting your cosmic story...
-        </motion.h6>
+          <Sparkles className="w-5 h-5 text-[#9B8DE3]" />
+          <Stars className="w-5 h-5 text-[#F8A1D1]" />
+          <Sparkles className="w-5 h-5 text-[#9B8DE3]" />
+        </motion.div>
       </div>
     );
   }
@@ -695,6 +728,275 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                 ))}
               </motion.div>
             </motion.div>
+
+            {/* Deep Dive Expandable Section */}
+            {(aiSummary.loveStyle || aiSummary.careerGifts || aiSummary.spiritualGifts || aiSummary.growthPath || aiSummary.fortuneInsight) && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.3 }}
+                className="mt-8 pt-8 border-t border-[#9B8DE3]/20"
+              >
+                <button
+                  onClick={() => setShowDeepDive(!showDeepDive)}
+                  className="w-full flex items-center justify-between text-[#F4E8DC] hover:text-[#F8A1D1] transition-colors group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#9B8DE3]" />
+                    <span className="text-lg font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
+                      Deep Dive Insights
+                    </span>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: showDeepDive ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown className="w-5 h-5 text-[#9B8DE3] group-hover:text-[#F8A1D1]" />
+                  </motion.div>
+                </button>
+
+                <AnimatePresence>
+                  {showDeepDive && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid md:grid-cols-2 gap-6 mt-6">
+                        {/* Love Style */}
+                        {aiSummary.loveStyle && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Heart className="w-4 h-4 text-[#F8A1D1]" />
+                              <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                Love & Relationships
+                              </h5>
+                            </div>
+                            <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              {aiSummary.loveStyle}
+                            </p>
+                          </motion.div>
+                        )}
+
+                        {/* Career Gifts */}
+                        {aiSummary.careerGifts && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Briefcase className="w-4 h-4 text-[#9B8DE3]" />
+                              <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                Career Gifts
+                              </h5>
+                            </div>
+                            <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              {aiSummary.careerGifts}
+                            </p>
+                          </motion.div>
+                        )}
+
+                        {/* Spiritual Gifts */}
+                        {aiSummary.spiritualGifts && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="w-4 h-4 text-[#F8A1D1]" />
+                              <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                Spiritual Gifts
+                              </h5>
+                            </div>
+                            <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              {aiSummary.spiritualGifts}
+                            </p>
+                          </motion.div>
+                        )}
+
+                        {/* Growth Path */}
+                        {aiSummary.growthPath && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4 text-[#9B8DE3]" />
+                              <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                Growth Path
+                              </h5>
+                            </div>
+                            <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              {aiSummary.growthPath}
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Compact Diamond Visualization */}
+                      {readingData && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.45 }}
+                          className="mt-8 mb-6"
+                        >
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <Stars className="w-4 h-4 text-[#9B8DE3]" />
+                            <h5 className="text-[#F4E8DC] text-sm font-semibold text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              Your Sacred Numbers Diamond
+                            </h5>
+                            <Stars className="w-4 h-4 text-[#9B8DE3]" />
+                          </div>
+
+                          <div className="flex justify-center">
+                            <div className="relative w-full max-w-[300px] sm:max-w-[340px] md:max-w-[380px] aspect-square">
+                              {/* SVG Diamond Shape with connecting lines */}
+                              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                  {/* Gradient for diamond fill */}
+                                  <linearGradient id="diamondGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style={{ stopColor: '#9B8DE3', stopOpacity: 0.1 }} />
+                                    <stop offset="50%" style={{ stopColor: '#F8A1D1', stopOpacity: 0.05 }} />
+                                    <stop offset="100%" style={{ stopColor: '#9B8DE3', stopOpacity: 0.1 }} />
+                                  </linearGradient>
+                                  {/* Glow filter */}
+                                  <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                    <feMerge>
+                                      <feMergeNode in="coloredBlur"/>
+                                      <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                  </filter>
+                                </defs>
+
+                                {/* Main Diamond Shape: Top -> Left -> Bottom -> Right -> Top */}
+                                <path
+                                  d="M 50,8 L 15,50 L 50,92 L 85,50 Z"
+                                  fill="url(#diamondGradient)"
+                                  stroke="#9B8DE3"
+                                  strokeWidth="0.5"
+                                  opacity="0.6"
+                                  filter="url(#glow)"
+                                />
+
+                                {/* Inner lines from center to corners */}
+                                <line x1="50" y1="8" x2="50" y2="50" stroke="#9B8DE3" strokeWidth="0.3" opacity="0.3" />
+                                <line x1="15" y1="50" x2="50" y2="50" stroke="#F8A1D1" strokeWidth="0.3" opacity="0.3" />
+                                <line x1="50" y1="50" x2="50" y2="92" stroke="#9B8DE3" strokeWidth="0.3" opacity="0.3" />
+                                <line x1="50" y1="50" x2="85" y2="50" stroke="#F8A1D1" strokeWidth="0.3" opacity="0.3" />
+
+                                {/* Diagonal lines to mid-points */}
+                                <line x1="50" y1="8" x2="32.5" y2="29" stroke="#9B8DE3" strokeWidth="0.2" opacity="0.2" strokeDasharray="1,1" />
+                                <line x1="50" y1="8" x2="67.5" y2="29" stroke="#F8A1D1" strokeWidth="0.2" opacity="0.2" strokeDasharray="1,1" />
+                                <line x1="15" y1="50" x2="32.5" y2="71" stroke="#9B8DE3" strokeWidth="0.2" opacity="0.2" strokeDasharray="1,1" />
+                                <line x1="85" y1="50" x2="67.5" y2="71" stroke="#F8A1D1" strokeWidth="0.2" opacity="0.2" strokeDasharray="1,1" />
+                              </svg>
+
+                              {/* Number Overlays - Positioned on diamond vertices */}
+                              {/* Top */}
+                              <div className="absolute top-[8%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm text-[#F4E8DC] bg-[#9B8DE3]/60 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#9B8DE3]/40">
+                                {readingData.top}
+                              </div>
+
+                              {/* Left */}
+                              <div className="absolute top-1/2 left-[15%] -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm text-[#F4E8DC] bg-[#F8A1D1]/60 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#F8A1D1]/40">
+                                {readingData.left}
+                              </div>
+
+                              {/* Center - for 3-word names OR first center for 4-word names */}
+                              {readingData.center && readingData.center !== 'N/A' && !readingData.center2 && (
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm text-[#F4E8DC] bg-gradient-to-br from-[#9B8DE3]/70 to-[#F8A1D1]/70 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#9B8DE3]/50">
+                                  {readingData.center}
+                                </div>
+                              )}
+
+                              {/* Two centers - for 4-word names, positioned horizontally on middle line */}
+                              {readingData.center && readingData.center2 && (
+                                <>
+                                  {/* Left center */}
+                                  <div className="absolute top-1/2 left-[40%] -translate-x-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-[10px] sm:text-xs text-[#F4E8DC] bg-gradient-to-br from-[#9B8DE3]/70 to-[#F8A1D1]/70 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#9B8DE3]/50">
+                                    {readingData.center}
+                                  </div>
+                                  {/* Right center */}
+                                  <div className="absolute top-1/2 left-[60%] -translate-x-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-[10px] sm:text-xs text-[#F4E8DC] bg-gradient-to-br from-[#9B8DE3]/70 to-[#F8A1D1]/70 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#9B8DE3]/50">
+                                    {readingData.center2}
+                                  </div>
+                                </>
+                              )}
+
+                              {/* Right */}
+                              <div className="absolute top-1/2 right-[15%] translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm text-[#F4E8DC] bg-[#F8A1D1]/60 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#F8A1D1]/40">
+                                {readingData.right}
+                              </div>
+
+                              {/* Bottom */}
+                              <div className="absolute bottom-[8%] left-1/2 -translate-x-1/2 translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm text-[#F4E8DC] bg-[#9B8DE3]/60 border-2 border-[#F4E8DC]/60 backdrop-blur-sm shadow-lg shadow-[#9B8DE3]/40">
+                                {readingData.bottom}
+                              </div>
+
+                              {/* Mid points - smaller and positioned along diamond edges */}
+                              <div className="absolute top-[29%] left-[32.5%] -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-semibold text-[10px] sm:text-xs text-[#F4E8DC]/90 bg-[#9B8DE3]/40 border border-[#F4E8DC]/40 backdrop-blur-sm">
+                                {readingData.up_mid_left}
+                              </div>
+
+                              <div className="absolute top-[29%] right-[32.5%] translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-semibold text-[10px] sm:text-xs text-[#F4E8DC]/90 bg-[#F8A1D1]/40 border border-[#F4E8DC]/40 backdrop-blur-sm">
+                                {readingData.up_mid_right}
+                              </div>
+
+                              <div className="absolute bottom-[29%] left-[32.5%] -translate-x-1/2 translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-semibold text-[10px] sm:text-xs text-[#F4E8DC]/90 bg-[#9B8DE3]/40 border border-[#F4E8DC]/40 backdrop-blur-sm">
+                                {readingData.low_mid_left}
+                              </div>
+
+                              <div className="absolute bottom-[29%] right-[32.5%] translate-x-1/2 translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-semibold text-[10px] sm:text-xs text-[#F4E8DC]/90 bg-[#F8A1D1]/40 border border-[#F4E8DC]/40 backdrop-blur-sm">
+                                {readingData.low_mid_right}
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-[#F4E8DC]/60 text-xs text-center mt-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            Your numerological blueprint visualized
+                          </p>
+                        </motion.div>
+                      )}
+
+                      {/* Fortune Insight - Full Width */}
+                      {aiSummary.fortuneInsight && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 }}
+                          className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#9B8DE3]/10 to-[#F8A1D1]/10 border border-[#9B8DE3]/20"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <Star className="w-4 h-4 text-[#F8A1D1]" />
+                            <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              Cosmic Fortune
+                            </h5>
+                          </div>
+                          <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            {aiSummary.fortuneInsight}
+                          </p>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
           </motion.div>
         </div>
       </motion.div>
