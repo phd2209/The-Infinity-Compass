@@ -284,13 +284,14 @@ Return exactly this structure:
       messages: [
         {
           role: 'system',
-          content: 'You are a mystical numerology expert who provides personalized, inspiring insights based on numerological calculations. Your responses should be uplifting, meaningful, and specific to the person\'s numbers.',
+          content: 'You are a mystical numerology expert who provides personalized, inspiring insights based on numerological calculations. Your responses should be uplifting, meaningful, and specific to the person\'s numbers. You MUST return valid JSON only.',
         },
         {
           role: 'user',
           content: prompt,
         },
       ],
+      response_format: { type: "json_object" }, // Force valid JSON output
       max_tokens: 700, // Increased for expanded fields
       temperature: 0.7,
     });
