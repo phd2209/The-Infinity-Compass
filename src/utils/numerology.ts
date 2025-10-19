@@ -777,13 +777,33 @@ export const calculateCircleValues = (array: (string | number)[]): string | numb
 };
 
 /**
+ * Sanitizes a name for numerology calculation by handling special characters
+ * - Apostrophes are removed (o'brien → obrien)
+ * - Hyphens become spaces (anne-dorthe → anne dorthe)
+ * - Other special characters become spaces
+ */
+export const sanitizeNameForCalculation = (name: string): string => {
+  // First, remove apostrophes completely (o'brien → obrien)
+  let sanitized = name.replace(/'/g, '');
+
+  // Replace hyphens and other special characters (except apostrophes, already removed) with spaces
+  // Keep only letters and spaces
+  sanitized = sanitized.replace(/[^a-zA-ZÅÆØåæø\s]/g, ' ');
+
+  // Replace multiple spaces with single space and trim
+  return sanitized.replace(/\s+/g, ' ').trim();
+};
+
+/**
  * Creates name values from a full name and upper diamond value
  */
 export const createNameValues = (name: string, upper: number): (string | number)[] => {
   const nameArray: (string | number)[] = [];
   const newArray: (string | number)[] = [];
 
-  const nameWords = name.split(" ");
+  // Sanitize the name to replace special characters with spaces
+  const sanitizedName = sanitizeNameForCalculation(name);
+  const nameWords = sanitizedName.split(" ").filter(word => word.length > 0);
 
   for (const word of nameWords) {
     let tempResult = 0;

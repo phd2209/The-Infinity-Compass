@@ -16,13 +16,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { NFTSelector } from '@/components/NFTSelector';
 import { useAuth } from '@/context/AuthContext';
 import { fetchUserWoWNFTs } from '@/services/nft';
+import { sanitizeNameForCalculation } from '@/utils/numerology';
 
 const formSchema = z.object({
   name: z.string()
     .min(1, 'Your sacred name holds the key to your numerology. Please enter your full birth name.')
     .refine(
       (name) => {
-        const wordCount = name.trim().split(/\s+/).length;
+        // Sanitize the name to replace special characters (hyphens, etc.) with spaces
+        // This ensures "anne-dorthe" counts as 2 words, not 1
+        const sanitizedName = sanitizeNameForCalculation(name);
+        const wordCount = sanitizedName.split(/\s+/).filter(word => word.length > 0).length;
         return wordCount >= 2 && wordCount <= 4;
       },
       {
