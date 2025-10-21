@@ -242,13 +242,25 @@ export default function LoginPage() {
                 className="text-xs text-[#F4E8DC]/80 mt-4"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
-                💡 For the best experience, log in using your main browser where you're already signed into Discord.
+                🔒 We NEVER ask for wallet access or private keys
               </p>
               <p
                 className="text-xs text-[#F4E8DC]/70"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
-                We do not store your personal data. Verification is limited to confirming your WoW holder role.
+                Discord verification is read-only — we only check your WoW holder role
+              </p>
+              <p
+                className="text-xs text-[#F4E8DC]/70"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                Your reading data stays private and is never stored or shared
+              </p>
+              <p
+                className="text-xs text-[#F4E8DC]/60 mt-3"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                💡 Tip: Use your main browser where you're already logged into Discord
               </p>
             </div>
           </div>
