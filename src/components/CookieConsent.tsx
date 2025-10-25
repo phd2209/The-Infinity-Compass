@@ -7,25 +7,27 @@ const GA_MEASUREMENT_ID = 'G-EQV7CG0894';
 
 // Function to load Google Analytics
 const loadGoogleAnalytics = () => {
-  // Initialize dataLayer first
-  window.dataLayer = window.dataLayer || [];
-  function gtag(...args: any[]) {
-    window.dataLayer.push(args);
+  // Prevent double-loading
+  if (document.querySelector(`script[src*="${GA_MEASUREMENT_ID}"]`)) {
+    console.log('GA4 already loaded');
+    return;
   }
-  window.gtag = gtag;
 
-  // Create and append the GA script
+  // Initialize dataLayer and gtag
+  window.dataLayer = window.dataLayer || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  window.gtag = function(...args: any[]) {
+    window.dataLayer.push(args);
+  };
+
+  // Send initial config
+  window.gtag('js', new Date());
+  window.gtag('config', GA_MEASUREMENT_ID);
+
+  // Load the GA script
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  script.crossOrigin = 'anonymous';
-
-  // Initialize after script loads
-  script.onload = () => {
-    gtag('js', new Date());
-    gtag('config', GA_MEASUREMENT_ID);
-  };
-
   document.head.appendChild(script);
 };
 
