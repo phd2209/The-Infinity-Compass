@@ -7,20 +7,26 @@ const GA_MEASUREMENT_ID = 'G-01D02EQTPJ';
 
 // Function to load Google Analytics
 const loadGoogleAnalytics = () => {
-  // Create and append the GA script
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  document.head.appendChild(script);
-
-  // Initialize dataLayer and gtag
+  // Initialize dataLayer first
   window.dataLayer = window.dataLayer || [];
   function gtag(...args: any[]) {
     window.dataLayer.push(args);
   }
   window.gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', GA_MEASUREMENT_ID);
+
+  // Create and append the GA script
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  script.crossOrigin = 'anonymous';
+
+  // Initialize after script loads
+  script.onload = () => {
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID);
+  };
+
+  document.head.appendChild(script);
 };
 
 export function CookieConsent() {
