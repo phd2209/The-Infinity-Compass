@@ -27,32 +27,32 @@ const slides: Slide[] = [
     id: 1,
     title: 'Welcome to the Infinity Compass demo ✨',
     subtitle: "See how safe and simple your cosmic journey is — no login needed.",
-    image: '/src/assets/demo/fortune-teller.png',
+    image: '/demo/fortune-teller.png',
   },
   {
     id: 2,
     title: 'Step 1: Connect safely with Discord',
     subtitle:
       'We use Discord authentication solely to verify you\'re a World of Women or World of Women Galaxy holder',
-    image: '/src/assets/demo/discord-auth.PNG',
+    image: '/demo/discord-auth.PNG',
   },
   {
     id: 3,
     title: 'Step 2a: Enter your wallet address',
     subtitle: 'Paste in your wallet address and we\'ll show you all your WoW/WoWG NFTs - no wallet connection needed!',
-    image: '/src/assets/demo/nft-selection.PNG',
+    image: '/demo/nft-selection.PNG',
   },
   {
     id: 4,
     title: 'Step 2b: Enter your details for the reading',
     subtitle: 'Choose your WoW NFT and provide your name & birth date for numerology',
-    image: '/src/assets/demo/nft-selection_1.PNG',
+    image: '/demo/nft-selection_1.PNG',
   },
   {
     id: 5,
     title: 'Step 3: Reveal your personalized reading',
     subtitle: "Powered by ancient numerology + your NFT's unique energy 🔮",
-    image: '/src/assets/demo/reading-sample.PNG',
+    image: '/demo/reading-sample.PNG',
     isLast: true,
   },
 ];
