@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const GA_MEASUREMENT_ID = 'G-HMG6YJGTB2';
+const GA_MEASUREMENT_ID = 'G-01D02EQTPJ';
 
 // Function to load Google Analytics
 const loadGoogleAnalytics = () => {
