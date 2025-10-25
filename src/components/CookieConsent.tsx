@@ -3,34 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const GA_MEASUREMENT_ID = 'G-EQV7CG0894';
-
-// Function to load Google Analytics
-const loadGoogleAnalytics = () => {
-  // Prevent double-loading
-  if (document.querySelector(`script[src*="${GA_MEASUREMENT_ID}"]`)) {
-    console.log('GA4 already loaded');
-    return;
-  }
-
-  // Initialize dataLayer and gtag
-  window.dataLayer = window.dataLayer || [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  window.gtag = function(...args: any[]) {
-    window.dataLayer.push(args);
-  };
-
-  // Send initial config
-  window.gtag('js', new Date());
-  window.gtag('config', GA_MEASUREMENT_ID);
-
-  // Load the GA script
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  document.head.appendChild(script);
-};
-
 export function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -38,30 +10,40 @@ export function CookieConsent() {
     // Check if user has already consented
     const consent = localStorage.getItem('cookie-consent');
 
-    if (consent === 'accepted') {
-      // User previously accepted - load GA4 immediately
-      loadGoogleAnalytics();
-    } else if (!consent) {
+    if (!consent) {
       // No choice made yet - show banner after a short delay
       const timer = setTimeout(() => {
         setIsVisible(true);
       }, 1500);
       return () => clearTimeout(timer);
+    } else if (consent === 'declined' && window.gtag) {
+      // User previously declined - disable analytics
+      window.gtag('consent', 'update', {
+        analytics_storage: 'denied',
+      });
     }
-    // If consent === 'declined', do nothing (don't load GA4, don't show banner)
   }, []);
 
   const handleAccept = () => {
     localStorage.setItem('cookie-consent', 'accepted');
     setIsVisible(false);
-    // Load GA4 now that user has accepted
-    loadGoogleAnalytics();
+    // Enable analytics via consent mode (GA4 is already loaded)
+    if (window.gtag) {
+      window.gtag('consent', 'update', {
+        analytics_storage: 'granted',
+      });
+    }
   };
 
   const handleDecline = () => {
     localStorage.setItem('cookie-consent', 'declined');
     setIsVisible(false);
-    // GA4 is never loaded, so nothing to disable
+    // Disable analytics via consent mode
+    if (window.gtag) {
+      window.gtag('consent', 'update', {
+        analytics_storage: 'denied',
+      });
+    }
   };
 
   return (
