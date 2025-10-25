@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getDiscordAuthUrl } from '@/config/discord';
+import { DemoModal } from '@/components/DemoModal';
+import { CookieConsent } from '@/components/CookieConsent';
 // import { NumerologyLogo } from '@/components/NumerologyLogo';
 
 const FORTUNE_TELLER_GREETINGS = [
@@ -18,6 +20,7 @@ const FORTUNE_TELLER_GREETINGS = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const [greeting, setGreeting] = useState('');
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   useEffect(() => {
     // Select random greeting on mount
@@ -220,6 +223,7 @@ export default function LoginPage() {
 
             <Button
               onClick={handleDiscordLogin}
+              data-discord-login
               className="w-full cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
@@ -235,6 +239,17 @@ export default function LoginPage() {
                 />
               </svg>
               Login with Discord
+            </Button>
+
+            {/* See Demo Button */}
+            <Button
+              onClick={() => setIsDemoOpen(true)}
+              variant="outline"
+              className="w-full cursor-pointer bg-transparent border-2 border-[#9B8DE3]/50 hover:border-[#F8A1D1]/70 hover:bg-[#9B8DE3]/10 text-[#F4E8DC] hover:text-white font-medium py-5 text-base transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(155,141,227,0.3)] mt-3"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Eye className="w-5 h-5 mr-2" />
+              See How It Works (no login)
             </Button>
 
             <div className="space-y-2">
@@ -266,6 +281,12 @@ export default function LoginPage() {
           </div>
         </Card>
       </div>
+
+      {/* Demo Modal */}
+      <DemoModal open={isDemoOpen} onOpenChange={setIsDemoOpen} />
+
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
     </div>
   );
 }
