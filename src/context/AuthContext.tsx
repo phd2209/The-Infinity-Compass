@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { NFT } from '@/types/nft';
+import { FEATURES } from '@/config/features';
 
 interface DiscordUser {
   id: string;
@@ -13,7 +14,9 @@ interface AuthContextType {
   accessToken: string | null;
   wowNFTs: NFT[];
   selectedNFT: NFT | null;
+  isDiscordRequired: boolean;
   setAuthenticated: (user: DiscordUser, token: string) => void;
+  bypassVerification: () => void;
   setWowNFTs: (nfts: NFT[]) => void;
   setSelectedNFT: (nft: NFT | null) => void;
   logout: () => void;
@@ -28,10 +31,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [wowNFTs, setWowNFTsState] = useState<NFT[]>([]);
   const [selectedNFT, setSelectedNFTState] = useState<NFT | null>(null);
 
+  const isDiscordRequired = FEATURES.DISCORD_VERIFICATION_REQUIRED;
+
   const setAuthenticated = (user: DiscordUser, token: string) => {
     setDiscordUser(user);
     setAccessToken(token);
     setIsVerified(true);
+  };
+
+  const bypassVerification = () => {
+    if (!isDiscordRequired) {
+      setIsVerified(true);
+      setDiscordUser({ id: 'guest', username: 'Guest User' });
+    }
   };
 
   const setWowNFTs = (nfts: NFT[]) => {
@@ -58,7 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         accessToken,
         wowNFTs,
         selectedNFT,
+        isDiscordRequired,
         setAuthenticated,
+        bypassVerification,
         setWowNFTs,
         setSelectedNFT,
         logout,

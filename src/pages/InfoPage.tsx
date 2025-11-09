@@ -3,9 +3,11 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useAuth } from '@/context/AuthContext';
 
 export default function InfoPage() {
   const navigate = useNavigate();
+  const { isDiscordRequired } = useAuth();
 
   // Generate floating particles
   const generateParticles = () => {
@@ -192,33 +194,35 @@ export default function InfoPage() {
             </CardContent>
           </Card>
 
-          {/* Discord Login section */}
-          <Card className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/30 to-[#0C0A1E]/30 border-[#9B8DE3]/40">
-            <CardHeader>
-              <h2
-                className="text-2xl font-semibold text-[#F4E8DC] flex items-center gap-2"
-                style={{ fontFamily: "'Cinzel', serif" }}
-              >
-                <Sparkles className="w-6 h-6 text-[#6BCFF6]" />
-                Why Discord Login?
-              </h2>
-            </CardHeader>
-            <CardContent>
-              <p
-                className="text-[#F4E8DC]/80 text-base leading-relaxed"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                We use <strong>Discord authentication</strong> to recognize verified <strong>World of Women</strong> and <strong>World of Women Galaxy</strong> holders —
-                a seamless way to confirm community membership <strong>without requiring a wallet connection</strong>.
-              </p>
-              <p
-                className="text-[#F4E8DC]/80 text-base leading-relaxed mt-4"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                Your privacy remains fully protected; the app receives only your Discord ID and username.
-              </p>
-            </CardContent>
-          </Card>
+          {/* Discord Login section - Only show when Discord is required */}
+          {isDiscordRequired && (
+            <Card className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/30 to-[#0C0A1E]/30 border-[#9B8DE3]/40">
+              <CardHeader>
+                <h2
+                  className="text-2xl font-semibold text-[#F4E8DC] flex items-center gap-2"
+                  style={{ fontFamily: "'Cinzel', serif" }}
+                >
+                  <Sparkles className="w-6 h-6 text-[#6BCFF6]" />
+                  Why Discord Login?
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <p
+                  className="text-[#F4E8DC]/80 text-base leading-relaxed"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  We use <strong>Discord authentication</strong> to recognize verified <strong>World of Women</strong> and <strong>World of Women Galaxy</strong> holders —
+                  a seamless way to confirm community membership <strong>without requiring a wallet connection</strong>.
+                </p>
+                <p
+                  className="text-[#F4E8DC]/80 text-base leading-relaxed mt-4"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  Your privacy remains fully protected; the app receives only your Discord ID and username.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* NFT Merge section */}
           <Card className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/30 to-[#0C0A1E]/30 border-[#9B8DE3]/40">
