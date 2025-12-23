@@ -4,10 +4,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- **Development server**: `npm run dev` - Starts Vite development server with HMR
+### Local Development Setup (IMPORTANT)
+
+**To test the full app with backend API support, you MUST use Vercel Dev:**
+
+1. **First time setup - Login to Vercel:**
+
+   ```bash
+   vercel login
+   ```
+
+2. **Start development server with API support:**
+
+   ```bash
+   vercel dev --listen 3001
+   ```
+
+   - This runs both frontend AND backend API routes on port 3001
+   - Required for: AI reading generation, avatar generation, NFT fetching
+   - Access app at: `http://localhost:3001`
+
+### Alternative Commands (Frontend Only)
+
+- **Frontend only** (no API): `npm run dev` - Vite dev server on port 3001 (API calls will fail)
 - **Build**: `npm run build` - TypeScript compile followed by Vite production build
 - **Lint**: `npm run lint` - Run ESLint on TypeScript/TSX files
-- **Preview**: `npm run preview` - Preview production build locally
+- **Preview**: `npm run preview` - Preview production build locally on port 3001
+
+### Port Configuration
+
+- **Port 3001** is configured in `vite.config.ts` and required for Discord OAuth
+- Frontend and backend both run on the same port (3001) when using `vercel dev`
 
 ## Project Architecture
 
