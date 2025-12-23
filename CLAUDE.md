@@ -145,12 +145,12 @@ Split the user journey into two paths:
   - Navigate to appropriate flow based on selection
   - **Completion Notes**: Created `src/pages/PathSelectionPage.tsx` with two interactive cards: "I Own a WoW NFT" (Wallet icon) and "Generate My Cosmic Avatar" (User icon). Features matching cosmic theme, hover effects, and navigation to `/enter` after selection.
 
-- [ ] **8. Update IndividualReadingPage for Non-WoW Flow**
+- [x] **8. Update IndividualReadingPage for Non-WoW Flow**
   - Skip wallet input and NFT selection if `userPath === 'non-wow'`
   - Show only name and birth date form
   - Update validation (remove NFT requirement for non-WoW)
   - Update submit handler
-  - **Completion Notes**: _Pending_
+  - **Completion Notes**: Updated `IndividualReadingPage.tsx` to check `userPath` from AuthContext. For non-WoW users: skips wallet input, skips NFT selection, shows name/birthdate form immediately, removes NFT validation requirement. Updated page subtitle to show appropriate message for each path.
 
 - [ ] **9. Generate Avatar After Reading Calculation**
   - Trigger avatar generation in ShareableReadingPage for non-WoW users

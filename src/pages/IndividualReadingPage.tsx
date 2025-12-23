@@ -47,12 +47,15 @@ interface IndividualReadingPageProps {
 }
 
 export default function IndividualReadingPage({ onUnLock }: IndividualReadingPageProps) {
-  const { wowNFTs, selectedNFT, setWowNFTs, setSelectedNFT } = useAuth();
+  const { wowNFTs, selectedNFT, setWowNFTs, setSelectedNFT, userPath } = useAuth();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [showWalletInput, setShowWalletInput] = useState(true);
   const [noNFTsFound, setNoNFTsFound] = useState(false);
+
+  // Check if user is on non-WoW path (skip NFT selection)
+  const isNonWowPath = userPath === 'non-wow';
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -122,7 +125,8 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
   }, []);
 
   const onSubmit = (data: FormData) => {
-    if (!selectedNFT) {
+    // Only require NFT selection for WoW path
+    if (!isNonWowPath && !selectedNFT) {
       form.setError('root', {
         message: 'Please select a WoW NFT to personalize your reading',
       });
@@ -188,13 +192,16 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
               className="text-[#F4E8DC]/90 text-lg mt-4 leading-relaxed px-4"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              Unite your World of Women energy with the ancient wisdom of numerology
+              {isNonWowPath
+                ? "Discover your cosmic blueprint through the ancient wisdom of numerology"
+                : "Unite your World of Women energy with the ancient wisdom of numerology"
+              }
             </p>
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Wallet Input Section */}
-            {showWalletInput && (
+            {/* Wallet Input Section - Only for WoW path */}
+            {!isNonWowPath && showWalletInput && (
               <div className="space-y-4">
                 <div className="text-center space-y-2">
                   <h3
@@ -268,8 +275,8 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
               </div>
             )}
 
-            {/* NFT Selection Section */}
-            {!showWalletInput && wowNFTs.length > 0 && (
+            {/* NFT Selection Section - Only for WoW path */}
+            {!isNonWowPath && !showWalletInput && wowNFTs.length > 0 && (
               <div className="space-y-4">
                 <div className="text-center">
                   <h3
@@ -323,11 +330,13 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
               </div>
             )}
 
-            {/* Form Section - Only show after NFT selected */}
-            {!showWalletInput && selectedNFT && (
+            {/* Form Section - Show after NFT selected (WoW path) OR immediately (non-WoW path) */}
+            {(isNonWowPath || (!showWalletInput && selectedNFT)) && (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="h-px bg-gradient-to-r from-transparent via-[#9B8DE3]/50 to-transparent my-6"></div>
+                  {!isNonWowPath && (
+                    <div className="h-px bg-gradient-to-r from-transparent via-[#9B8DE3]/50 to-transparent my-6"></div>
+                  )}
 
                   {/* Clear instruction heading */}
                   <div className="text-center space-y-2">
@@ -335,13 +344,16 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                       className="text-2xl text-[#F4E8DC] font-semibold"
                       style={{ fontFamily: "'Cinzel', serif" }}
                     >
-                      Almost There!
+                      {isNonWowPath ? "Enter Your Details" : "Almost There!"}
                     </h3>
                     <p
                       className="text-[#F4E8DC]/70 text-base"
                       style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
-                      Just 2 more things to unlock your reading
+                      {isNonWowPath
+                        ? "Share your name and birth date to unlock your cosmic reading"
+                        : "Just 2 more things to unlock your reading"
+                      }
                     </p>
                   </div>
 
