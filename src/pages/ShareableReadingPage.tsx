@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star } from 'lucide-react';
 import { calculateNumerologyData, type NumerologyData } from '@/utils/numerology';
 import { generateNumerologySummary, type AISummary } from '@/services/aiService';
+import { generateCosmicAvatar } from '@/services/avatarService';
 import { useAuth } from '@/context/AuthContext';
 import html2canvas from 'html2canvas-pro';
 
@@ -37,12 +38,13 @@ export interface DiamondData extends NumerologyData {
 }
 
 export default function ShareableReadingPage({ userData, onBack }: ShareableReadingPageProps) {
-  const { selectedNFT } = useAuth();
+  const { selectedNFT, userPath, generatedAvatar, setGeneratedAvatar } = useAuth();
   const [readingData, setReadingData] = useState<DiamondData | null>(null);
   const [aiSummary, setAiSummary] = useState<AISummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
   const [includeName, setIncludeName] = useState(() => {
     return localStorage.getItem('includeNameInReading') === 'true';
   });
@@ -122,6 +124,22 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
       };
 
       setReadingData(data);
+
+      // Generate AI avatar for non-WoW users
+      if (userPath === 'non-wow' && !generatedAvatar) {
+        console.log('Generating cosmic avatar for non-WoW user...');
+        setIsGeneratingAvatar(true);
+        try {
+          const avatarResult = await generateCosmicAvatar(numerologyData);
+          setGeneratedAvatar(avatarResult.imageUrl);
+          console.log('Avatar generated successfully:', avatarResult.imageUrl);
+        } catch (error) {
+          console.error('Failed to generate avatar:', error);
+          // Continue without avatar - will use fallback
+        } finally {
+          setIsGeneratingAvatar(false);
+        }
+      }
 
       try {
         const summary = await generateNumerologySummary(data, userData.focusArea);
@@ -540,36 +558,58 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
           {/* NFT Integration Section - Hero */}
           <div className="relative">
             <div className="grid md:grid-cols-2 gap-0">
-              {/* Left: NFT Image */}
-              {selectedNFT && (
+              {/* Left: NFT Image or Generated Avatar */}
+              {(selectedNFT || (userPath === 'non-wow' && (generatedAvatar || isGeneratingAvatar))) && (
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                   className="relative aspect-square md:aspect-auto"
                 >
-                  <img
-                    src={selectedNFT.imageUrl}
-                    alt={selectedNFT.name}
-                    className="w-full h-full object-cover"
-                  />
-                  {/* NFT info overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          selectedNFT.collection === 'WoW'
-                            ? 'bg-[#9B8DE3] text-white'
-                            : 'bg-[#F8A1D1] text-white'
-                        }`}
-                      >
-                        {selectedNFT.collection}
-                      </span>
-                      <span className="text-white text-sm font-medium">
-                        #{selectedNFT.tokenId}
-                      </span>
+                  {isGeneratingAvatar ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1D1B3A] to-[#0C0A1E]">
+                      <div className="text-center space-y-4">
+                        <Loader2 className="w-12 h-12 text-[#9B8DE3] animate-spin mx-auto" />
+                        <p className="text-[#F4E8DC]/80 text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          Crafting your cosmic avatar...
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      <img
+                        src={selectedNFT ? selectedNFT.imageUrl : generatedAvatar || '/placeholder-avatar.png'}
+                        alt={selectedNFT ? selectedNFT.name : 'Your Cosmic Avatar'}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* NFT info overlay or AI Generated badge */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                        <div className="flex items-center gap-2">
+                          {selectedNFT ? (
+                            <>
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                  selectedNFT.collection === 'WoW'
+                                    ? 'bg-[#9B8DE3] text-white'
+                                    : 'bg-[#F8A1D1] text-white'
+                                }`}
+                              >
+                                {selectedNFT.collection}
+                              </span>
+                              <span className="text-white text-sm font-medium">
+                                #{selectedNFT.tokenId}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] text-white flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" />
+                              AI Generated Avatar
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               )}
 

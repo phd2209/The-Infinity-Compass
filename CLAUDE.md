@@ -152,19 +152,19 @@ Split the user journey into two paths:
   - Update submit handler
   - **Completion Notes**: Updated `IndividualReadingPage.tsx` to check `userPath` from AuthContext. For non-WoW users: skips wallet input, skips NFT selection, shows name/birthdate form immediately, removes NFT validation requirement. Updated page subtitle to show appropriate message for each path.
 
-- [ ] **9. Generate Avatar After Reading Calculation**
+- [x] **9. Generate Avatar After Reading Calculation**
   - Trigger avatar generation in ShareableReadingPage for non-WoW users
   - Generate avatar based on calculated numerology data
   - Show loading state during generation
   - Cache generated avatar in context and localStorage
-  - **Completion Notes**: _Pending_
+  - **Completion Notes**: Added avatar generation in `initializeReading()` function. Checks if `userPath === 'non-wow'` and `!generatedAvatar`, then calls `generateCosmicAvatar()` with numerology data. Shows loading state with spinner. Stores result in AuthContext via `setGeneratedAvatar()`. Includes error handling with graceful fallback.
 
-- [ ] **10. Update ShareableReadingPage for Both Avatar Types**
+- [x] **10. Update ShareableReadingPage for Both Avatar Types**
   - Detect if user has WoW NFT or generated avatar
   - Render appropriate image in card layout
   - Ensure layout works for both image types
   - Add "Generated Cosmic Avatar" badge/label for AI avatars
-  - **Completion Notes**: _Pending_
+  - **Completion Notes**: Updated image display section to check for both `selectedNFT` and `generatedAvatar`. Shows loading spinner while generating avatar. Displays either NFT image or generated avatar. Badge shows "WoW #tokenId" for NFTs or "AI Generated Avatar" with sparkle icon for generated avatars. Layout identical for both types.
 
 - [x] **11. Update App Routing**
   - Add PathSelectionPage as initial route
