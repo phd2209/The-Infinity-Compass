@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import PathSelectionPage from './pages/PathSelectionPage';
 import IndividualReadingPage from './pages/IndividualReadingPage';
 import ReadingPage from './pages/ReadingPage';
 import ShareableReadingPage from './pages/ShareableReadingPage';
@@ -15,8 +16,19 @@ interface UserData {
   focusArea: string;
 }
 
+// Wrapper component to handle navigation after path selection
+function PathSelectionPageWrapper() {
+  const navigate = useNavigate();
+
+  const handlePathSelected = () => {
+    navigate('/enter');
+  };
+
+  return <PathSelectionPage onPathSelected={handlePathSelected} />;
+}
+
 function AppRoutes() {
-  const { isVerified, setAuthenticated } = useAuth();
+  const { isVerified, setAuthenticated, userPath } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
 
   const handleUnLock = (data: UserData) => {
@@ -39,15 +51,31 @@ function AppRoutes() {
           element={<AuthCallbackPage onAuthenticated={setAuthenticated} />}
         />
 
+        {/* Path Selection Page - NEW intermediate step */}
+        <Route
+          path="/choose-path"
+          element={
+            isVerified ? (
+              <PathSelectionPageWrapper />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
         {/* Protected routes - require verification */}
         <Route
           path="/enter"
           element={
             isVerified ? (
-              !userData ? (
-                <IndividualReadingPage onUnLock={handleUnLock} onBack={handleBack} />
+              userPath ? (
+                !userData ? (
+                  <IndividualReadingPage onUnLock={handleUnLock} onBack={handleBack} />
+                ) : (
+                  <Navigate to="/share" replace />
+                )
               ) : (
-                <Navigate to="/share" replace />
+                <Navigate to="/choose-path" replace />
               )
             ) : (
               <Navigate to="/login" replace />

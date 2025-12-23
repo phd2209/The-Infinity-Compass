@@ -96,11 +96,11 @@ Split the user journey into two paths:
   - Create and checkout `feature/wow-non-wow-split` branch
   - **Completion Notes**: Branch created and checked out successfully on 2025-12-23
 
-- [ ] **2. Design Path Selection UI**
+- [x] **2. Design Path Selection UI**
   - Add initial path selection screen before current IndividualReadingPage
   - Two options: "I own a WoW NFT" / "Generate my cosmic avatar"
   - Design mockup with mystical theme matching existing UI
-  - **Completion Notes**: _Pending_
+  - **Completion Notes**: Created `PathSelectionPage.tsx` with two card-based options matching existing mystical UI theme. Includes cosmic particles, sacred geometry background, and smooth animations.
 
 - [x] **3. Research AI Avatar Generation Service**
   - Evaluate options: DALL-E 3, Midjourney API, Stable Diffusion, Replicate, etc.
@@ -138,12 +138,12 @@ Split the user journey into two paths:
   - Update setters and getters
   - **Completion Notes**: Updated `AuthContext.tsx` with `userPath` and `generatedAvatar` state management. Added `setUserPath()` and `setGeneratedAvatar()` functions with localStorage persistence. Path switching logic clears appropriate data (switching to non-wow clears NFT data, switching to wow clears avatar). Updated logout to clear all new state.
 
-- [ ] **7. Create PathSelectionPage Component**
+- [x] **7. Create PathSelectionPage Component**
   - New page component for initial path selection
   - Two prominent options with descriptions
   - Match existing mystical UI design
   - Navigate to appropriate flow based on selection
-  - **Completion Notes**: _Pending_
+  - **Completion Notes**: Created `src/pages/PathSelectionPage.tsx` with two interactive cards: "I Own a WoW NFT" (Wallet icon) and "Generate My Cosmic Avatar" (User icon). Features matching cosmic theme, hover effects, and navigation to `/enter` after selection.
 
 - [ ] **8. Update IndividualReadingPage for Non-WoW Flow**
   - Skip wallet input and NFT selection if `userPath === 'non-wow'`
@@ -166,11 +166,11 @@ Split the user journey into two paths:
   - Add "Generated Cosmic Avatar" badge/label for AI avatars
   - **Completion Notes**: _Pending_
 
-- [ ] **11. Update App Routing**
+- [x] **11. Update App Routing**
   - Add PathSelectionPage as initial route
   - Update navigation flow: PathSelection → IndividualReading → ShareableReading
   - Preserve ability to go back and change path
-  - **Completion Notes**: _Pending_
+  - **Completion Notes**: Updated `App.tsx` with new `/choose-path` route. Login now redirects to path selection. Added conditional routing: if `userPath` is null, redirect to `/choose-path`. Updated LoginPage to navigate to `/choose-path` after bypassing verification.
 
 - [ ] **12. Handle Edge Cases**
   - What if avatar generation fails? (Fallback avatar/retry)

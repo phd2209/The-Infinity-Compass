@@ -36,9 +36,9 @@ export default function LoginPage() {
   };
 
   const handleEnter = () => {
-    // Bypass verification and navigate to the app
+    // Bypass verification and navigate to path selection
     bypassVerification();
-    navigate('/enter');
+    navigate('/choose-path');
   };
 
   return (
