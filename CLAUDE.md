@@ -6,35 +6,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Local Development Setup (IMPORTANT)
 
-**To test the full app with backend API support, you MUST use Vercel Dev:**
+**To test the full app with backend API support, run both Vite and Vercel Dev together:**
 
-1. **First time setup - Login to Vercel:**
+1. **First time setup - Login to Vercel and install yarn:**
 
    ```bash
    vercel login
+   npm install -g yarn
    ```
 
-2. **Start development server with API support:**
+2. **Start full development environment (recommended):**
 
    ```bash
-   vercel dev --listen 3001
+   npm run dev:full
    ```
 
-   - This runs both frontend AND backend API routes on port 3001
-   - Required for: AI reading generation, avatar generation, NFT fetching
-   - Access app at: `http://localhost:3001`
+   This runs two servers concurrently:
+   - **Vite** (frontend) on port 3001
+   - **Vercel Dev** (API functions) on port 3000
+   - Vite proxies `/api/*` requests to Vercel Dev automatically
 
-### Alternative Commands (Frontend Only)
+   Access app at: `http://localhost:3001`
+
+3. **Test API is working:**
+
+   Visit `http://localhost:3001/api/health` - should return JSON like:
+   ```json
+   {"status":"ok","timestamp":"...","cache":{...}}
+   ```
+
+### Alternative Commands
 
 - **Frontend only** (no API): `npm run dev` - Vite dev server on port 3001 (API calls will fail)
+- **API only**: `npm run dev:api` - Vercel Dev on port 3000 (no frontend)
 - **Build**: `npm run build` - TypeScript compile followed by Vite production build
 - **Lint**: `npm run lint` - Run ESLint on TypeScript/TSX files
 - **Preview**: `npm run preview` - Preview production build locally on port 3001
 
 ### Port Configuration
 
-- **Port 3001** is configured in `vite.config.ts` and required for Discord OAuth
-- Frontend and backend both run on the same port (3001) when using `vercel dev`
+- **Port 3001**: Vite frontend (what you access in browser)
+- **Port 3000**: Vercel Dev API functions (proxied through Vite)
+- Port 3001 is required for Discord OAuth callback
 
 ## Project Architecture
 
@@ -231,8 +244,581 @@ Split the user journey into two paths:
 
 #### Talisman System Goal
 
-Add modular lucky talisman/pendant product offering with AI-generated component images.
+Create an exclusive, premium crystal talisman product line positioned as small-scale luxury jewelry (think Tiffany & Co. aesthetic). Each talisman features a natural raw crystal with a personalized numerology number, delivered with luxury packaging and certificate of authenticity.
+
+#### Brand Positioning: Exclusive Luxury
+
+**Target Audience:**
+- Numerology/spirituality enthusiasts
+- Crystal collectors who attend crystal fairs/messes
+- People seeking meaningful, personalized jewelry
+- NOT: Commercial jewelry shoppers (Swarovski, fashion jewelry)
+
+**Brand Differentiators:**
+
+| Commercial Jewelry | Infinity Compass Talismans |
+|-------------------|----------------------------|
+| Perfect, identical pieces | Each crystal unique |
+| Faceted, polished cuts | Natural raw/tumbled form |
+| Fashion statement | Spiritual talisman |
+| Mass manufactured | Hand-selected crystals |
+| Crystal = decoration | Crystal = energy/meaning |
+
+**Price Point:** $149-179 (signals quality, thoughtful purchase)
+
+#### Core Concept
+
+After receiving their numerology reading, users can purchase a personalized crystal talisman:
+
+- Crystal type determined by **birth day reduced to single digit** (1-9)
+- **Natural raw/tumbled crystal** (not polished geometric cuts)
+- **Bail cap design** with engraved birth number
+- Sterling silver or gold vermeil metals
+- Luxury packaging with certificate of authenticity
+- **9 representative images** (one per crystal type)
+- Each crystal is unique - images are representative
+
+#### Product Design: Bail Cap + Raw Crystal
+
+```
+        ┌─────┐
+        │  7  │  ← Metal bail cap with engraved number
+        └──┬──┘
+           │
+      ┌────┴────┐
+      │ ▓▓▓▓▓▓▓ │
+      │ ▓▓▓▓▓▓▓ │  ← Natural raw/tumbled crystal
+      │ ▓▓▓▓▓▓▓ │    (organic shape, not geometric)
+      │ ▓▓▓▓▓▓  │
+      └─────────┘
+```
+
+**Design Elements:**
+- **Crystal:** Natural tumbled or raw form, 20-30mm
+- **Bail cap:** Metal cap that grips the crystal top
+- **Engraving:** Single digit (1-9) on bail cap front
+- **Chain:** Matching metal, 18" princess length
+- **No name engraving** - keeps it cleaner, number is the personalization
+
+#### Numerology-to-Crystal Mapping
+
+| Number | Crystal | Metal | Spiritual Meaning |
+|--------|---------|-------|-------------------|
+| 1 | Clear Quartz | Gold Vermeil | Clarity, amplification, new beginnings, leadership |
+| 2 | Moonstone | Sterling Silver | Intuition, emotional balance, harmony, receptivity |
+| 3 | Carnelian | Gold Vermeil | Joy, creativity, motivation, self-expression |
+| 4 | Black Tourmaline | Sterling Silver | Grounding, protection, stability, structure |
+| 5 | Aquamarine | Sterling Silver | Freedom, courage, adventure, adaptability |
+| 6 | Rose Quartz | Sterling Silver | Love, compassion, harmony, nurturing |
+| 7 | Amethyst | Sterling Silver | Spirituality, wisdom, insight, introspection |
+| 8 | Citrine | Gold Vermeil | Abundance, success, manifestation, ambition |
+| 9 | Rose Quartz | Gold Vermeil | Universal love, empathy, healing, humanitarianism |
+
+**Note:** Brass removed - using only sterling silver and gold vermeil for premium positioning.
+
+#### Physical Specifications
+
+**Crystal:**
+- Form: Natural tumbled or raw (not faceted/cabochon)
+- Size: 20-30mm
+- Grade: Hand-selected, higher quality specimens
+- Each piece unique (natural variation is a feature)
+
+**Bail Cap:**
+- Material: Sterling silver (.925) or 18K gold vermeil
+- Design: Clean cap that grips crystal top
+- Engraving: Single digit, 3-4mm, sans-serif font
+- Stamped with .925 or metal purity mark
+
+**Chain:**
+- Material: Matching sterling silver or gold vermeil
+- Length: 18" princess (sits at collarbone)
+- Style: Delicate cable or rope chain
+
+#### Luxury Packaging & Presentation
+
+**Packaging Components:**
+
+```
+┌─────────────────────────────┐
+│  ┌───────────────────────┐  │  ← Outer sleeve (signature deep purple/indigo)
+│  │                       │  │     with embossed logo
+│  │   ┌───────────────┐   │  │
+│  │   │   [Crystal]   │   │  │  ← Inner box (black velvet lined)
+│  │   │  on silk pad  │   │  │
+│  │   └───────────────┘   │  │
+│  │                       │  │
+│  │   Certificate below   │  │  ← Personalized certificate
+│  │   Ritual card         │  │  ← Activation instructions
+│  └───────────────────────┘  │
+└─────────────────────────────┘
+```
+
+**Included Items:**
+1. Outer sleeve in signature color (deep purple/indigo)
+2. Inner velvet-lined box
+3. Silk or satin cushion
+4. Certificate of Authenticity
+5. Crystal activation ritual card
+6. Care instructions
+
+#### Certificate of Authenticity
+
+```
+╔══════════════════════════════════════════════════╗
+║                                                  ║
+║          THE INFINITY COMPASS                    ║
+║          Certificate of Authenticity             ║
+║                                                  ║
+║  ─────────────────────────────────────────────   ║
+║                                                  ║
+║  This talisman was created for:                  ║
+║                                                  ║
+║              [CUSTOMER NAME]                     ║
+║              Birth Number: [X]                   ║
+║                                                  ║
+║  Crystal: Natural [Crystal Name]                 ║
+║  Metal: Sterling Silver (.925)                   ║
+║  Meaning: [Spiritual meaning]                    ║
+║                                                  ║
+║  "Your crystal was hand-selected to resonate     ║
+║   with your unique numerological energy."        ║
+║                                                  ║
+║  Serial: IC-2024-XXXXX                           ║
+║  Created: [Date]                                 ║
+║                                                  ║
+║  [Signature]                                     ║
+║  The Infinity Compass                            ║
+║                                                  ║
+╚══════════════════════════════════════════════════╝
+```
+
+#### Crystal Activation Ritual Card
+
+```
+╭─────────────────────────────────────╮
+│                                     │
+│     ACTIVATING YOUR TALISMAN        │
+│                                     │
+│  1. Hold your crystal in moonlight  │
+│     for one full night              │
+│                                     │
+│  2. Set your intention by speaking  │
+│     your birth number aloud         │
+│                                     │
+│  3. Wear your talisman close to     │
+│     your heart                      │
+│                                     │
+│  Your [Crystal] amplifies your      │
+│  natural gifts of [meaning].        │
+│                                     │
+╰─────────────────────────────────────╯
+```
+
+#### Representative Image Strategy
+
+**Total images needed: 9** (one per crystal type)
+
+Since raw crystals vary naturally, we show representative images with explanatory text.
+
+| Number | Crystal | Image |
+|--------|---------|-------|
+| 1 | Clear Quartz | ✓ |
+| 2 | Moonstone | ✓ |
+| 3 | Carnelian | ✓ |
+| 4 | Black Tourmaline | ✓ |
+| 5 | Aquamarine | ✓ |
+| 6 | Rose Quartz | ✓ |
+| 7 | Amethyst | ✓ |
+| 8 | Citrine | ✓ |
+| 9 | Rose Quartz (gold) | ✓ |
+
+**Website Copy for Each Crystal:**
+
+> "Your [Crystal Name] talisman will be unique - each crystal is hand-selected for its spiritual energy and natural beauty. The one that arrives is the one meant for you."
+
+**AI Prompt Template for Representative Images:**
+
+```
+Professional product photograph of a raw natural [CRYSTAL] crystal pendant,
+the crystal is in its natural tumbled form showing beautiful natural texture,
+attached with a simple [METAL] bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate [METAL] chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with subtle glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**Note:** Flux 1.1 Pro does not support negative prompts, so all exclusions must be inline in the main prompt.
+
+#### All 9 Image Generation Prompts
+
+Copy-paste these directly into Replicate (model: `black-forest-labs/flux-1.1-pro`, aspect ratio: 1:1).
+
+**1. Clear Quartz / Gold Vermeil:**
+```
+Professional product photograph of a raw natural clear quartz crystal pendant,
+the crystal is in its natural tumbled form showing beautiful transparency and natural texture,
+attached with a simple gold vermeil bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate gold vermeil chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with subtle glow through the crystal,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**2. Moonstone / Sterling Silver:**
+```
+Professional product photograph of a raw natural moonstone crystal pendant,
+the crystal is in its natural tumbled form showing beautiful blue adularescence and milky sheen,
+attached with a simple sterling silver bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate sterling silver chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with subtle iridescent glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**3. Carnelian / Gold Vermeil:**
+```
+Professional product photograph of a raw natural carnelian crystal pendant,
+the crystal is in its natural tumbled form showing beautiful warm orange-red color and translucency,
+attached with a simple gold vermeil bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate gold vermeil chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with warm glow through the stone,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**4. Black Tourmaline / Sterling Silver:**
+```
+Professional product photograph of a raw natural black tourmaline crystal pendant,
+the crystal is in its natural form showing beautiful black color with natural striations and texture,
+attached with a simple sterling silver bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate sterling silver chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with subtle reflective surface,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**5. Aquamarine / Sterling Silver:**
+```
+Professional product photograph of a raw natural aquamarine crystal pendant,
+the crystal is in its natural tumbled form showing beautiful pale blue-green color and transparency,
+attached with a simple sterling silver bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate sterling silver chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with subtle oceanic glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**6. Rose Quartz / Sterling Silver:**
+```
+Professional product photograph of a raw natural rose quartz crystal pendant,
+the crystal is in its natural tumbled form showing beautiful soft pink color and gentle translucency,
+attached with a simple sterling silver bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate sterling silver chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with gentle pink glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**7. Amethyst / Sterling Silver:**
+```
+Professional product photograph of a raw natural amethyst crystal pendant,
+the crystal is in its natural tumbled form showing beautiful deep purple color and natural clarity,
+attached with a simple sterling silver bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate sterling silver chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with rich purple glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**8. Citrine / Gold Vermeil:**
+```
+Professional product photograph of a raw natural citrine crystal pendant,
+the crystal is in its natural tumbled form showing beautiful warm golden yellow color and sunny transparency,
+attached with a simple gold vermeil bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate gold vermeil chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with warm sunny glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**9. Rose Quartz / Gold Vermeil:**
+```
+Professional product photograph of a raw natural rose quartz crystal pendant,
+the crystal is in its natural tumbled form showing beautiful soft pink color and gentle translucency,
+attached with a simple gold vermeil bail cap at the top,
+the bail cap has a flat circular front surface,
+organic natural crystal shape not geometric or faceted,
+hanging on a delicate gold vermeil chain,
+luxury spiritual jewelry aesthetic,
+isolated on pure white background, solid white backdrop, no props, no decorations, nothing in background,
+soft diffused studio lighting with gentle pink glow,
+product photography, pendant only, no model, no person, no human, no hands, no fingers, no body parts,
+8k, high detail, professional e-commerce jewelry photography,
+avoid wire wrapping, no faceted cuts, no geometric shapes, no text or numbers visible
+```
+
+**File Naming Convention:**
+```
+src/assets/pendents/talisman-1-clear-quartz.png
+src/assets/pendents/talisman-2-moonstone.png
+src/assets/pendents/talisman-3-carnelian.png
+src/assets/pendents/talisman-4-black-tourmaline.png
+src/assets/pendents/talisman-5-aquamarine.png
+src/assets/pendents/talisman-6-rose-quartz-silver.png
+src/assets/pendents/talisman-7-amethyst.png
+src/assets/pendents/talisman-8-citrine.png
+src/assets/pendents/talisman-9-rose-quartz-gold.png
+```
+
+**Replicate Settings:**
+- Model: `black-forest-labs/flux-1.1-pro`
+- Aspect Ratio: 1:1
+- Output Format: PNG
+- Output Quality: 100
+
+**Quality Checklist for Each Image:**
+- [ ] Crystal looks natural/tumbled (not faceted)
+- [ ] Bail cap visible at top with flat front surface
+- [ ] Chain matches metal color
+- [ ] Background is clean white
+- [ ] Lighting is consistent with other images
+- [ ] Crystal color is accurate for type
+- [ ] Overall luxury aesthetic achieved
+
+#### Exclusivity Signals
+
+**On Website:**
+- "Hand-selected crystals"
+- "Limited production"
+- "Each piece unique"
+- "Made to order"
+- Serial numbers displayed
+- "Not available in stores"
+
+**Language Guidelines:**
+- Say "Talisman" not "necklace" or "pendant"
+- Say "Hand-selected" not "picked"
+- Say "Crafted" not "made"
+- Say "Your personal" not "a"
+- Say "Natural" not "raw"
+
+#### Production & Vendor Strategy (Premium)
+
+**Vendor Requirements:**
+
+- ✓ Natural tumbled gemstones (not synthetic)
+- ✓ Sterling silver (.925) stamped
+- ✓ Gold vermeil option (18K gold over sterling)
+- ✓ Custom bail cap design with engraving
+- ✓ Individual QC photos before shipping
+- ✓ Premium packaging capability
+- ✓ Certificate printing
+- ✓ Gift-ready presentation
+
+**Cost Structure (Target):**
+
+| Component | Est. Cost |
+|-----------|-----------|
+| Natural crystal (quality) | $5-15 |
+| Sterling silver bail + chain | $15-25 |
+| Engraving | $3-5 |
+| Premium packaging | $8-12 |
+| Certificate + cards | $2-3 |
+| Labor + QC | $10-15 |
+| **Total COGS** | **$43-75** |
+| **Retail Price** | **$149-179** |
+| **Margin** | ~60% |
+
+**Vendor Options:**
+
+1. **Artisan Partnership (Recommended for MVP)**
+   - Find Etsy jeweler who specializes in raw crystal jewelry
+   - Partner for custom production
+   - Higher cost but better quality control
+   - Can start with small batches
+
+2. **Alibaba Premium Manufacturers**
+   - Wuzhou, Guangdong region
+   - Request samples before committing
+   - MOQ: 50-100 pieces
+   - Longer lead time but scalable
+
+#### User Flow
+
+```
+ShareableReadingPage → [See Reading] → "Claim Your Talisman" CTA
+                                              ↓
+                                    TalismanPage
+                                              ↓
+              [Display: Your crystal is [Name], symbolizing [meaning]]
+                                              ↓
+                     [Show representative image + uniqueness message]
+                                              ↓
+                      [Product details: materials, packaging, certificate]
+                                              ↓
+                              [Add to Cart - $149-179]
+                                              ↓
+                                    Checkout (Stripe)
+```
+
+#### Data Model
+
+```typescript
+interface TalismanConfig {
+  birthNumber: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+  crystal: string;
+  metal: 'sterling-silver' | 'gold-vermeil';
+  meaning: string;
+  description: string;
+  representativeImageUrl: string;
+  price: number;
+}
+
+const TALISMAN_ASSOCIATIONS: Record<number, TalismanConfig> = {
+  1: {
+    birthNumber: 1,
+    crystal: 'Clear Quartz',
+    metal: 'gold-vermeil',
+    meaning: 'clarity and new beginnings',
+    description: 'The master healer crystal amplifies your natural leadership energy and brings clarity to your path.',
+    representativeImageUrl: '/src/assets/pendents/talisman-1-clear-quartz.png',
+    price: 169
+  },
+  2: {
+    birthNumber: 2,
+    crystal: 'Moonstone',
+    metal: 'sterling-silver',
+    meaning: 'intuition and harmony',
+    description: 'This ethereal stone enhances your intuitive gifts and brings emotional balance to relationships.',
+    representativeImageUrl: '/src/assets/pendents/talisman-2-moonstone.png',
+    price: 159
+  },
+  // ... etc for 3-9
+};
+
+interface TalismanOrder {
+  serialNumber: string;        // IC-2024-XXXXX
+  customerName: string;
+  birthNumber: number;
+  talismanConfig: TalismanConfig;
+  createdAt: Date;
+  certificateData: CertificateData;
+}
+```
 
 #### Talisman System Tasks
 
-- Tasks to be defined once WoW/Non-WoW split is complete
+- [ ] **1. Create Feature Branch**
+  - Create and checkout `feature/talisman-product` branch
+  - **Completion Notes**: _Pending_
+
+- [x] **2. Generate 9 Representative Crystal Images**
+  - Generate one image per crystal type via Replicate
+  - Quality review each image, regenerate if needed
+  - Ensure consistent style across all 9
+  - Upload to cloud storage
+  - **Completion Notes**: All 9 images generated using Flux 1.1 Pro on Replicate. Images stored in `src/assets/pendents/`. Completed 2025-12-25.
+
+- [x] **3. Create Talisman Data Service**
+  - Create `src/services/talismanService.ts`
+  - Implement `TALISMAN_ASSOCIATIONS` mapping
+  - Function: `getTalismanConfig(birthNumber): TalismanConfig`
+  - Function: `generateSerialNumber(): string`
+  - Function: `generateCertificateData(order): CertificateData`
+  - **Completion Notes**: Created `src/services/talismanService.ts` with full crystal mappings for numbers 1-9. Images imported statically for Vite bundling. Completed 2025-12-25.
+
+- [ ] **4. Create TalismanPage Component**
+  - New page at `/talisman` route
+  - Display user's assigned crystal with meaning
+  - Show representative image with uniqueness message
+  - Product details: materials, what's included
+  - Premium pricing display
+  - Match mystical UI theme
+  - **Completion Notes**: _Pending_
+
+- [x] **5. Add Talisman CTA to ShareableReadingPage**
+  - "Claim Your Talisman" button (premium language)
+  - Brief crystal meaning teaser
+  - Navigation to TalismanPage
+  - **Completion Notes**: Added "Your Sacred Crystal" accordion section after Deep Dive Insights. Shows crystal image, name, meaning, description, and CTA button. Completed 2025-12-25.
+
+- [ ] **6. Design Certificate & Packaging Templates**
+  - Certificate of Authenticity design (PDF generation)
+  - Ritual card content for each crystal
+  - Packaging specifications document for vendor
+  - **Completion Notes**: _Pending_
+
+- [ ] **7. Implement Stripe Checkout**
+  - Stripe integration for payment
+  - Order creation with serial number
+  - Confirmation email with certificate preview
+  - **Completion Notes**: _Pending_
+
+- [ ] **8. Vendor Partnership Setup**
+  - Research and contact artisan jewelers
+  - Request samples
+  - Negotiate pricing and MOQ
+  - Establish quality standards
+  - Test order with packaging
+  - **Completion Notes**: _Pending_
+
+- [ ] **9. Testing**
+  - Test all 9 crystal variations display correctly
+  - Test checkout flow end-to-end
+  - Test certificate generation
+  - Test on mobile and desktop
+  - **Completion Notes**: _Pending_
+
+- [ ] **10. Launch Preparation**
+  - Product photography (real samples)
+  - Website copy refinement
+  - Email sequences (order confirmation, shipping, delivery)
+  - Customer support documentation
+  - **Completion Notes**: _Pending_

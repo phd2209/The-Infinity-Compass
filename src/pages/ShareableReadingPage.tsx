@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star } from 'lucide-react';
+import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star, Gem } from 'lucide-react';
 import { calculateNumerologyData, type NumerologyData } from '@/utils/numerology';
 import { generateNumerologySummary, type AISummary } from '@/services/aiService';
 import { generateCosmicAvatar } from '@/services/avatarService';
 import { useAuth } from '@/context/AuthContext';
+import { getTalismanConfig, type TalismanConfig } from '@/services/talismanService';
 import html2canvas from 'html2canvas-pro';
 
 interface ShareableReadingPageProps {
@@ -13,6 +14,7 @@ interface ShareableReadingPageProps {
     name: string;
     birthDate: Date;
     focusArea: string;
+    gender?: 'woman' | 'man' | 'non-binary';
   };
   onBack?: () => void;
 }
@@ -49,6 +51,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
     return localStorage.getItem('includeNameInReading') === 'true';
   });
   const [showDeepDive, setShowDeepDive] = useState(false);
+  const [showSacredCrystal, setShowSacredCrystal] = useState(false);
+  const [talismanConfig, setTalismanConfig] = useState<TalismanConfig | null>(null);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const initializationKey = useRef<string>('');
@@ -89,6 +93,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   };
 
   useEffect(() => {
+    console.log('ShareableReadingPage useEffect - userPath:', userPath, 'generatedAvatar:', generatedAvatar);
+
     const currentKey = `${name}-${birthDate.toISOString()}-${userData.focusArea}`;
 
     if (initializationKey.current === currentKey) {
@@ -99,6 +105,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
     initializationKey.current = currentKey;
 
     const initializeReading = async () => {
+      console.log('initializeReading called - userPath:', userPath, 'generatedAvatar:', generatedAvatar);
       const numerologyData = calculateNumerologyData(name, birthDate);
 
       const data: DiamondData = {
@@ -125,12 +132,16 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
 
       setReadingData(data);
 
+      // Get talisman config based on Life Path number (top of diamond)
+      const talisman = getTalismanConfig(data.top);
+      setTalismanConfig(talisman);
+
       // Generate AI avatar for non-WoW users
       if (userPath === 'non-wow' && !generatedAvatar) {
-        console.log('Generating cosmic avatar for non-WoW user...');
+        console.log('Generating cosmic avatar for non-WoW user with gender:', userData.gender, 'birthDate:', birthDate);
         setIsGeneratingAvatar(true);
         try {
-          const avatarResult = await generateCosmicAvatar(numerologyData);
+          const avatarResult = await generateCosmicAvatar(numerologyData, false, userData.gender, birthDate);
           setGeneratedAvatar(avatarResult.imageUrl);
           console.log('Avatar generated successfully:', avatarResult.imageUrl);
         } catch (error) {
@@ -164,7 +175,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
     setTimeout(() => {
       initializeReading();
     }, 2500);
-  }, [name, birthDate, userData.focusArea]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, birthDate, userData.focusArea, userPath]);
 
   const handleNameToggle = () => {
     const newValue = !includeName;
@@ -1032,6 +1044,143 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           </p>
                         </motion.div>
                       )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+
+            {/* Sacred Crystal Section */}
+            {talismanConfig && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+                className="mt-8 pt-8 border-t border-[#F8A1D1]/20"
+              >
+                <button
+                  onClick={() => setShowSacredCrystal(!showSacredCrystal)}
+                  className="w-full flex items-center justify-between text-[#F4E8DC] hover:text-[#F8A1D1] transition-colors group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Gem className="w-5 h-5 text-[#F8A1D1]" />
+                    <span className="text-lg font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
+                      Your Sacred Crystal
+                    </span>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: showSacredCrystal ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown className="w-5 h-5 text-[#F8A1D1] group-hover:text-[#9B8DE3]" />
+                  </motion.div>
+                </button>
+
+                <AnimatePresence>
+                  {showSacredCrystal && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-6 space-y-6">
+                        {/* Crystal Image */}
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.1 }}
+                          className="flex justify-center"
+                        >
+                          <div className="relative w-48 h-48 md:w-56 md:h-56">
+                            <img
+                              src={talismanConfig.imageUrl}
+                              alt={`${talismanConfig.crystal} Talisman`}
+                              className="w-full h-full object-contain rounded-2xl"
+                            />
+                            <div className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] text-white text-xs font-bold">
+                              {talismanConfig.birthNumber}
+                            </div>
+                          </div>
+                        </motion.div>
+
+                        {/* Crystal Info */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="text-center space-y-3"
+                        >
+                          <h4
+                            className="text-xl font-bold bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] bg-clip-text text-transparent"
+                            style={{ fontFamily: "'Cinzel', serif" }}
+                          >
+                            {talismanConfig.crystal}
+                          </h4>
+                          <p className="text-[#F8A1D1] text-sm italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            The stone of {talismanConfig.meaning}
+                          </p>
+                        </motion.div>
+
+                        {/* Description */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="p-4 rounded-xl bg-gradient-to-r from-[#9B8DE3]/10 to-[#F8A1D1]/10 border border-[#F8A1D1]/20"
+                        >
+                          <p className="text-[#F4E8DC]/90 text-sm leading-relaxed text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            {talismanConfig.description}
+                          </p>
+                        </motion.div>
+
+                        {/* Uniqueness Message */}
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                          className="text-[#F4E8DC]/60 text-xs text-center italic"
+                          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                        >
+                          "Each crystal is hand-selected for its spiritual energy and natural beauty. The one that arrives is the one meant for you."
+                        </motion.p>
+
+                        {/* CTA Button */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 }}
+                          className="flex justify-center pt-2"
+                        >
+                          <Button
+                            onClick={() => {
+                              // TODO: Navigate to talisman page when implemented
+                              console.log('Navigate to talisman page');
+                            }}
+                            className="bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white px-8 py-3 rounded-xl shadow-lg shadow-[#9B8DE3]/30"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            <Gem className="w-4 h-4 mr-2" />
+                            Claim Your Talisman
+                          </Button>
+                        </motion.div>
+
+                        {/* Material Info */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.6 }}
+                          className="flex justify-center gap-4 text-xs text-[#F4E8DC]/50"
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                          <span>{talismanConfig.metalDisplay}</span>
+                          <span>•</span>
+                          <span>Natural Crystal</span>
+                          <span>•</span>
+                          <span>Certificate of Authenticity</span>
+                        </motion.div>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

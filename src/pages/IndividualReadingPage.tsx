@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Stars, Sparkles, Loader2, X } from 'lucide-react';
+import { CalendarIcon, Stars, Sparkles, Loader2, X, User } from 'lucide-react';
 import "react-day-picker/style.css";
 
 import { Button } from '@/components/ui/button';
@@ -37,12 +37,13 @@ const formSchema = z.object({
     message: 'Your cosmic birth date is required to unlock your numerology blueprint.',
   }),
   collection: z.enum(['all', 'WoW', 'WoWG']),
+  gender: z.enum(['woman', 'man', 'non-binary']).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 interface IndividualReadingPageProps {
-  onUnLock: (data: { name: string; birthDate: Date; focusArea: string }) => void;
+  onUnLock: (data: { name: string; birthDate: Date; focusArea: string; gender?: 'woman' | 'man' | 'non-binary' }) => void;
   onBack?: () => void;
 }
 
@@ -133,10 +134,19 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
       return;
     }
 
+    // Require gender for non-WoW path
+    if (isNonWowPath && !data.gender) {
+      form.setError('gender', {
+        message: 'Please select how you identify to personalize your cosmic avatar',
+      });
+      return;
+    }
+
     onUnLock({
       name: data.name,
       birthDate: data.birthDate,
       focusArea: 'general', // Keep for compatibility
+      gender: isNonWowPath ? data.gender : undefined,
     });
   };
 
@@ -463,6 +473,50 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                       </FormItem>
                     )}
                   />
+
+                  {/* Gender selector - Only for non-WoW path */}
+                  {isNonWowPath && (
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel
+                            className="text-[#F4E8DC] font-semibold text-lg flex items-center space-x-2"
+                            style={{ fontFamily: "'Cinzel', serif" }}
+                          >
+                            <User className="w-5 h-5 text-[#9B8DE3]" />
+                            <span>I Identify As</span>
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="w-full bg-black/40 border-[#9B8DE3]/40 text-white h-16 text-xl">
+                                <SelectValue placeholder="Select how you identify" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#1D1B3A]/95 border-[#9B8DE3]/40 backdrop-blur-md">
+                              <SelectItem value="woman" className="text-white hover:bg-[#9B8DE3]/30 text-lg py-3">
+                                Woman
+                              </SelectItem>
+                              <SelectItem value="man" className="text-white hover:bg-[#9B8DE3]/30 text-lg py-3">
+                                Man
+                              </SelectItem>
+                              <SelectItem value="non-binary" className="text-white hover:bg-[#9B8DE3]/30 text-lg py-3">
+                                Non-binary
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p
+                            className="text-[#F4E8DC]/60 text-xs"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            This helps us create a personalized cosmic avatar for your reading
+                          </p>
+                          <FormMessage className="text-[#F8A1D1] font-medium" />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   {form.formState.errors.root && (
                     <p className="text-[#F8A1D1] text-base text-center font-medium">

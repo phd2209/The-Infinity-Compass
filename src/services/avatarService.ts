@@ -109,16 +109,66 @@ const getBirthdayBackground = (planetName?: string): string => {
 };
 
 /**
+ * Get age descriptor based on birth date
+ */
+const getAgeAppearance = (birthDate?: Date): string => {
+  if (!birthDate) return '';
+
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+
+  if (age < 25) {
+    return 'youthful, in their early twenties';
+  } else if (age < 35) {
+    return 'young adult, in their late twenties to early thirties';
+  } else if (age < 45) {
+    return 'mature adult, in their late thirties to early forties';
+  } else if (age < 55) {
+    return 'distinguished, in their late forties to early fifties';
+  } else if (age < 65) {
+    return 'wise and seasoned, in their late fifties to early sixties';
+  } else {
+    return 'elder sage, with graceful aging and wisdom in their features';
+  }
+};
+
+/**
+ * Get gender-specific appearance descriptor for avatar prompt
+ */
+const getGenderAppearance = (gender?: 'woman' | 'man' | 'non-binary', birthDate?: Date): string => {
+  const ageDesc = getAgeAppearance(birthDate);
+  const ageClause = ageDesc ? `, ${ageDesc}` : '';
+
+  switch (gender) {
+    case 'woman':
+      return `beautiful woman${ageClause}, feminine features, elegant`;
+    case 'man':
+      return `handsome man${ageClause}, masculine features, strong`;
+    case 'non-binary':
+      return `androgynous person${ageClause}, balanced features, ethereal`;
+    default:
+      return 'mystical being, otherworldly features';
+  }
+};
+
+/**
  * Generate comprehensive prompt for cosmic avatar based on numerology data
  */
-export const generateAvatarPrompt = (data: NumerologyData): string => {
+export const generateAvatarPrompt = (
+  data: NumerologyData,
+  gender?: 'woman' | 'man' | 'non-binary',
+  birthDate?: Date
+): string => {
   // Get the first value from nameValues as the primary numerology number
   const lifePathNumber = data.diamond_upper_value;
   const expressionNumber = data.nameValues[0] as number;
   const soulUrgeNumber = data.nameValues[data.nameValues.length - 1] as number;
-  const personalityNumber = data.diamond_lower_value;
+  const personalityNumber = typeof data.diamond_lower_value === 'number'
+    ? data.diamond_lower_value
+    : parseInt(String(data.diamond_lower_value), 10) || 9;
   const planetName = data.birthdayInterpretation?.planetName;
 
+  const genderAppearance = getGenderAppearance(gender, birthDate);
   const archetype = getLifePathArchetype(lifePathNumber);
   const expressionStyle = getExpressionStyle(expressionNumber);
   const colors = getSoulUrgeColors(soulUrgeNumber);
@@ -126,7 +176,7 @@ export const generateAvatarPrompt = (data: NumerologyData): string => {
   const background = getBirthdayBackground(planetName);
 
   // Construct the comprehensive prompt
-  const prompt = `Portrait of a mystical cosmic being, ${archetype}, ${expressionStyle},
+  const prompt = `Portrait of a ${genderAppearance}, mystical cosmic being, ${archetype}, ${expressionStyle},
 ${colors}, ${aesthetic}, ${background},
 ethereal and magical atmosphere, divine light, sacred energy,
 portrait photography style, centered composition, facing camera,
@@ -144,34 +194,53 @@ transcendent presence, numerology symbolism subtle in background`;
  */
 export const generateCosmicAvatar = async (
   data: NumerologyData,
-  forceRegenerate: boolean = false
+  forceRegenerate: boolean = false,
+  gender?: 'woman' | 'man' | 'non-binary',
+  birthDate?: Date
 ): Promise<AvatarGenerationResult> => {
   console.log('Avatar Service - Generating cosmic avatar via backend API');
 
-  // Generate the prompt
-  const prompt = generateAvatarPrompt(data);
+  // Generate the prompt with gender and birthDate for age
+  const prompt = generateAvatarPrompt(data, gender, birthDate);
   console.log('Generated prompt:', prompt);
 
-  // Create a cache key based on numerology data
-  const cacheKey = `avatar_${data.diamond_upper_value}_${data.nameValues.join('_')}_${data.diamond_lower_value}`;
+  // Create a cache key based on numerology data, gender, and birth year (for age range)
+  const birthYear = birthDate ? birthDate.getFullYear() : 'unknown';
+  const cacheKey = `avatar_${data.diamond_upper_value}_${data.nameValues.join('_')}_${data.diamond_lower_value}_${gender || 'default'}_${birthYear}`;
 
   // Check localStorage cache unless force regenerate
+  // Replicate URLs expire after ~24 hours, so we add expiry check
   if (!forceRegenerate) {
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      console.log('Using cached avatar');
-      return {
-        imageUrl: cached,
-        prompt,
-        cached: true
-      };
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      try {
+        const { imageUrl, timestamp } = JSON.parse(cachedData);
+        const cacheAge = Date.now() - timestamp;
+        const MAX_CACHE_AGE = 20 * 60 * 60 * 1000; // 20 hours (before Replicate's ~24h expiry)
+
+        if (cacheAge < MAX_CACHE_AGE && imageUrl) {
+          console.log('Using cached avatar (age:', Math.round(cacheAge / 1000 / 60), 'minutes)');
+          return {
+            imageUrl,
+            prompt,
+            cached: true
+          };
+        } else {
+          console.log('Cached avatar expired, regenerating...');
+          localStorage.removeItem(cacheKey);
+        }
+      } catch {
+        // Old format cache (just URL string), remove it
+        console.log('Old cache format detected, removing...');
+        localStorage.removeItem(cacheKey);
+      }
     }
   }
 
   try {
     // Call backend API to generate avatar
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    const response = await fetch(`${apiUrl}/api/generate-avatar`, {
+    // Use relative URL so Vite's proxy can handle the request
+    const response = await fetch('/api/generate-avatar', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -184,17 +253,23 @@ export const generateCosmicAvatar = async (
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('API Error Response:', errorText);
       throw new Error(`Avatar generation failed: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
+    console.log('API Response:', JSON.stringify(result, null, 2));
 
     if (!result.imageUrl) {
-      throw new Error('No image URL returned from API');
+      console.error('No imageUrl in response:', result);
+      throw new Error(`No image URL returned from API. Response: ${JSON.stringify(result)}`);
     }
 
-    // Cache the result
-    localStorage.setItem(cacheKey, result.imageUrl);
+    // Cache the result with timestamp for expiry checking
+    localStorage.setItem(cacheKey, JSON.stringify({
+      imageUrl: result.imageUrl,
+      timestamp: Date.now()
+    }));
 
     console.log('Avatar generated successfully:', result.imageUrl);
 

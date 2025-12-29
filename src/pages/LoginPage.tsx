@@ -292,12 +292,6 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <p
-                className="text-xs text-[#F4E8DC]/80 mt-4"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                🔒 No wallet connection needed
-              </p>
               {isDiscordRequired && (
                 <p
                   className="text-xs text-[#F4E8DC]/70"

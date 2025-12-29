@@ -14,6 +14,7 @@ interface UserData {
   name: string;
   birthDate: Date;
   focusArea: string;
+  gender?: 'woman' | 'man' | 'non-binary';
 }
 
 // Wrapper component to handle navigation after path selection

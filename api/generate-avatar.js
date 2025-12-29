@@ -73,27 +73,40 @@ export default async function handler(req, res) {
 
     // Use SDXL model - excellent for portraits with mystical/fantasy themes
     // Model: stability-ai/sdxl
-    const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
-      {
-        input: {
-          prompt: prompt,
-          negative_prompt: "ugly, deformed, blurry, bad anatomy, bad proportions, distorted face, low quality, watermark, text, duplicate, mutation, disfigured",
-          width: 1024,
-          height: 1024,
-          num_outputs: 1,
-          scheduler: "K_EULER",
-          num_inference_steps: 25,
-          guidance_scale: 7.5,
-          seed: Math.floor(Math.random() * 1000000), // Random seed for variety
-        }
+    // Use prediction API to avoid streaming issues
+    const prediction = await replicate.predictions.create({
+      version: "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+      input: {
+        prompt: prompt,
+        negative_prompt: "ugly, deformed, blurry, bad anatomy, bad proportions, distorted face, low quality, watermark, text, duplicate, mutation, disfigured",
+        width: 1024,
+        height: 1024,
+        num_outputs: 1,
+        scheduler: "K_EULER",
+        num_inference_steps: 25,
+        guidance_scale: 7.5,
+        seed: Math.floor(Math.random() * 1000000), // Random seed for variety
       }
-    );
+    });
 
-    console.log('Replicate output:', output);
+    console.log('Prediction created:', prediction.id);
+
+    // Wait for the prediction to complete
+    let result = prediction;
+    while (result.status !== 'succeeded' && result.status !== 'failed') {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      result = await replicate.predictions.get(prediction.id);
+      console.log('Prediction status:', result.status);
+    }
+
+    if (result.status === 'failed') {
+      throw new Error(`Prediction failed: ${result.error || 'Unknown error'}`);
+    }
+
+    console.log('Replicate output:', result.output);
 
     // Replicate returns an array of image URLs
-    const imageUrl = Array.isArray(output) ? output[0] : output;
+    const imageUrl = Array.isArray(result.output) ? result.output[0] : result.output;
 
     if (!imageUrl) {
       throw new Error('No image URL returned from Replicate');
