@@ -9,6 +9,7 @@ import ReadingPage from './pages/ReadingPage';
 import ShareableReadingPage from './pages/ShareableReadingPage';
 import NumerologyTestPage from './pages/NumerologyTestPage';
 import InfoPage from './pages/InfoPage';
+import YearForecastPage from './pages/YearForecastPage';
 
 interface UserData {
   name: string;
@@ -111,6 +112,9 @@ function AppRoutes() {
 
         {/* Test page - accessible without authentication */}
         <Route path="/test" element={<NumerologyTestPage />} />
+
+        {/* Year Forecast page - accessible without authentication */}
+        <Route path="/forecast" element={<YearForecastPage />} />
 
         {/* Default route redirects to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />

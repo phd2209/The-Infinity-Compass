@@ -500,3 +500,61 @@ export const getPeriodTitle = (value: number): string => {
   };
   return titles[reduced] || 'Unknown';
 };
+
+/**
+ * Calculate the column number from diamond data
+ *
+ * Column number = sum of inner diamond values (circles):
+ * - Top diamond value
+ * - Upper circle(s)
+ * - Mid name value(s)
+ * - Lower circle(s)
+ * - Bottom diamond value
+ *
+ * The result is reduced to a single digit.
+ */
+export interface DiamondValues {
+  top: number;
+  bottom: number;
+  upperCircle: number[];
+  upperLowerCircle: number[];
+  lowerCircle: number[];
+  lowerLowerCircle: number[];
+  midNameValues: number[];
+}
+
+export const calculateColumnNumber = (diamond: DiamondValues): { raw: number; reduced: number } => {
+  let sum = 0;
+
+  // Add top and bottom diamond values
+  sum += diamond.top;
+  sum += diamond.bottom;
+
+  // Add upper circles
+  diamond.upperCircle.forEach(v => sum += v);
+  diamond.upperLowerCircle.forEach(v => sum += v);
+
+  // Add mid name values (the center numbers)
+  diamond.midNameValues.forEach(v => sum += v);
+
+  // Add lower circles
+  diamond.lowerCircle.forEach(v => sum += v);
+  diamond.lowerLowerCircle.forEach(v => sum += v);
+
+  return {
+    raw: sum,
+    reduced: reduceNumber(sum)
+  };
+};
+
+/**
+ * Extract numeric value from a string or number (handles compound numbers like "10/1")
+ */
+export const extractNumericValue = (val: string | number): number => {
+  if (typeof val === 'number') return val;
+  // Handle compound numbers like "10/1" - take the reduced part
+  if (val.includes('/')) {
+    return parseInt(val.split('/')[1], 10);
+  }
+  return parseInt(val, 10) || 0;
+};
