@@ -5,9 +5,9 @@
  * Users enter name and birthdate to see their yearly periods.
  */
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, Sparkles, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar, Sparkles, ArrowRight, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,10 +19,24 @@ import {
 } from '@/services/yearSeriesService';
 import YearForecastCard from '@/components/YearForecastCard';
 
+const STORAGE_KEY = 'infinity_compass_forecast_data';
+
+interface StoredData {
+  name: string;
+  birthDateStr: string;
+  topDiamond: number;
+  bottomDiamond: number;
+  columnNumber: number;
+  savedAt: string;
+}
+
 export default function YearForecastPage() {
   const [name, setName] = useState('');
   const [birthDateStr, setBirthDateStr] = useState('');
   const [showForecast, setShowForecast] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [hasStoredData, setHasStoredData] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [forecastData, setForecastData] = useState<{
     name: string;
     birthDate: Date;
@@ -30,6 +44,56 @@ export default function YearForecastPage() {
     bottomDiamond: number;
     columnNumber: number;
   } | null>(null);
+
+  // Load stored data on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const data: StoredData = JSON.parse(stored);
+        setName(data.name);
+        setBirthDateStr(data.birthDateStr);
+        setHasStoredData(true);
+        setRememberMe(true);
+
+        // Auto-show forecast if we have valid stored data
+        const birthDate = new Date(data.birthDateStr);
+        if (data.name && !isNaN(birthDate.getTime())) {
+          setForecastData({
+            name: data.name,
+            birthDate,
+            topDiamond: data.topDiamond,
+            bottomDiamond: data.bottomDiamond,
+            columnNumber: data.columnNumber,
+          });
+          setShowForecast(true);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load stored data:', e);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  const saveToStorage = (data: StoredData) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      setHasStoredData(true);
+    } catch (e) {
+      console.error('Failed to save data:', e);
+    }
+  };
+
+  const clearStoredData = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setHasStoredData(false);
+    setRememberMe(false);
+    setShowClearConfirm(false);
+    setName('');
+    setBirthDateStr('');
+    setShowForecast(false);
+    setForecastData(null);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,13 +114,30 @@ export default function YearForecastPage() {
       midNameValues: numerologyData.midNameValues.map(extractNumericValue),
     });
 
+    const topDiamond = numerologyData.diamond_upper_value;
+    const bottomDiamond = reduceNumber(extractNumericValue(numerologyData.diamond_lower_value));
+    const columnNumber = columnData.reduced;
+
     setForecastData({
       name: name.trim(),
       birthDate,
-      topDiamond: numerologyData.diamond_upper_value,
-      bottomDiamond: reduceNumber(extractNumericValue(numerologyData.diamond_lower_value)),
-      columnNumber: columnData.reduced,
+      topDiamond,
+      bottomDiamond,
+      columnNumber,
     });
+
+    // Save to localStorage if user opted in
+    if (rememberMe) {
+      saveToStorage({
+        name: name.trim(),
+        birthDateStr,
+        topDiamond,
+        bottomDiamond,
+        columnNumber,
+        savedAt: new Date().toISOString(),
+      });
+    }
+
     setShowForecast(true);
   };
 
@@ -174,6 +255,47 @@ export default function YearForecastPage() {
                 />
               </div>
 
+              {/* Remember me checkbox */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#9B8DE3]/50 bg-[#1D1B3A]/50 text-[#9B8DE3] focus:ring-[#9B8DE3]/30 focus:ring-offset-0"
+                  />
+                  <span
+                    className="text-[#F4E8DC]/70 text-sm group-hover:text-[#F4E8DC] transition-colors"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    Remember me for next visit
+                  </span>
+                </label>
+
+                {hasStoredData && (
+                  <button
+                    type="button"
+                    onClick={() => setShowClearConfirm(true)}
+                    className="text-[#F4E8DC]/50 text-xs hover:text-[#F8A1D1] transition-colors flex items-center gap-1"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Clear saved data
+                  </button>
+                )}
+              </div>
+
+              {/* Privacy note */}
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-[#9B8DE3]/10 border border-[#9B8DE3]/20">
+                <Shield className="w-4 h-4 text-[#9B8DE3] flex-shrink-0 mt-0.5" />
+                <p
+                  className="text-[#F4E8DC]/60 text-xs leading-relaxed"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  Your data stays on your device only. We never send or store your personal information on our servers.
+                </p>
+              </div>
+
               {/* Submit button */}
               <Button
                 type="submit"
@@ -226,6 +348,56 @@ export default function YearForecastPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Clear data confirmation modal */}
+      <AnimatePresence>
+        {showClearConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowClearConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-[#1D1B3A] to-[#0C0A1E] p-6 rounded-2xl border border-[#9B8DE3]/40 max-w-sm w-full"
+            >
+              <h3
+                className="text-xl font-bold text-[#F4E8DC] mb-3"
+                style={{ fontFamily: "'Cinzel', serif" }}
+              >
+                Clear Saved Data?
+              </h3>
+              <p
+                className="text-[#F4E8DC]/70 text-sm mb-6"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                This will remove your name and birth date from this device. You'll need to enter them again on your next visit.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowClearConfirm(false)}
+                  variant="outline"
+                  className="flex-1 bg-transparent border-[#9B8DE3]/40 text-[#F4E8DC] hover:bg-[#9B8DE3]/20"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={clearStoredData}
+                  className="flex-1 bg-gradient-to-r from-[#F8A1D1] to-[#E891C1] hover:from-[#E891C1] hover:to-[#D881B1] text-white"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear Data
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
