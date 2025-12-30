@@ -115,6 +115,182 @@ The core numerology logic involves:
 
 ---
 
+## Application User Flow
+
+### The Shareable Card IS the Product
+
+The core insight: **sharing creates viral growth**. The shareable card is not an afterthought — it's the primary output. Everything else (deep readings, full forecasts, talismans) is for those who want more.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   SHAREABLE CARD (what gets posted on X)                    │
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │                                                     │   │
+│   │          ✧ THE INFINITY COMPASS ✧                   │   │
+│   │                                                     │   │
+│   │              TONI's 2025                            │   │
+│   │                                                     │   │
+│   │         Current Energy: 9                           │   │
+│   │         "The Completer"                             │   │
+│   │                                                     │   │
+│   │    Finish what you started.                         │   │
+│   │    Release what no longer serves.                   │   │
+│   │                                                     │   │
+│   │         ─────────────────────                       │   │
+│   │         What's YOUR energy?                         │   │
+│   │         theinfinitycompass.com                      │   │
+│   │                                                     │   │
+│   └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│   This is what spreads.                                     │
+│   Simple. Visual. Curiosity-inducing.                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### What Makes People Actually Share?
+
+| Element | Why It Works |
+|---------|--------------|
+| Personal | "This is MY energy" - identity |
+| Timely | "Right NOW" - relevance |
+| Short | One number, one phrase - digestible |
+| Mysterious | "The Completer" - intriguing |
+| Question | "What's yours?" - invites engagement |
+| Beautiful | Aesthetic matters on social |
+
+### The Viral Funnel
+
+```
+See friend's share on X
+        ↓
+Curious → Click link
+        ↓
+Enter name + birthdate (10 seconds)
+        ↓
+See YOUR current energy (instant payoff)
+        ↓
+[Share yours] ← MOST WILL STOP HERE (and that's fine!)
+        ↓
+Some click "See full 2025" (Year Forecast)
+        ↓
+Fewer click "Deep profile" (Full Diamond Reading)
+        ↓
+Rare few → "Get your talisman" (Product)
+```
+
+**The magic:** Even if 90% only share and leave, they've brought more people in.
+
+### Layered Journey (Progressive Depth)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        LAYERED JOURNEY APPROACH                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  LAYER 1         LAYER 2           LAYER 3              LAYER 4 (optional)  │
+│  Landing         Entry             Shareable Card       Deep Dive            │
+│  (/login)        (/enter)          (/share)             (accordions)         │
+│                                                                              │
+│  ┌─────────┐    ┌─────────┐       ┌─────────────┐      ┌─────────────┐      │
+│  │ Welcome │    │ Name    │       │ YOUR 2025   │      │ Full        │      │
+│  │         │ ►  │         │  ►    │ Current     │  ►   │ Diamond     │      │
+│  │ Fortune │    │ Birth   │       │ Energy      │      │ Chart       │      │
+│  │ Teller  │    │ Date    │       │             │      │             │      │
+│  │         │    │         │       │ [SHARE]     │      │ Year Series │      │
+│  │ Begin   │    │ Focus   │       │             │      │             │      │
+│  │ Reading │    │ Area    │       │ See More ▼  │      │ Talisman    │      │
+│  └─────────┘    └─────────┘       └─────────────┘      └─────────────┘      │
+│                                                                              │
+│  10 sec          30 sec            INSTANT PAYOFF       FOR CURIOUS          │
+│  Set tone        Collect data      Most stop here       Few go deeper        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Page-by-Page Breakdown
+
+#### Layer 1: Landing Page (`/login`)
+**Purpose:** Welcome users, set mystical tone, single CTA
+
+- Logo + Title + Tagline
+- Fortune Teller with random greeting
+- Three feature highlights (what they'll get)
+- "Begin My Reading" button
+- Privacy note
+
+**Design:** No card container — content floats directly on cosmic background for immersion
+
+#### Layer 2: Entry Page (`/enter`)
+**Purpose:** Collect minimal data needed for calculation (10-30 seconds)
+
+| Field | Required | Why |
+|-------|----------|-----|
+| Full Name | Yes | Letter-to-number mapping for numerology |
+| Birth Date | Yes | Life path, personal year calculations |
+| Focus Area | Optional | Contextualizes the reading |
+
+**Design:** Simple form, cosmic background, clear submit button
+
+#### Layer 3: Shareable Card Page (`/share`)
+**Purpose:** Deliver instant payoff + encourage sharing
+
+**Above the fold (what everyone sees):**
+- Personal shareable card with current energy
+- Share button (prominent)
+- Download image button
+
+**Below the fold (for the curious):**
+- "See your full 2025" → Year Series Forecast accordion
+- "Explore your diamond" → Full numerology chart accordion
+- "Your sacred crystal" → Talisman product CTA
+
+**Design:** The shareable card is the hero. Everything else is expandable accordions.
+
+### Route Configuration
+
+```
+/login    → Landing Page (entry point)
+/enter    → Entry Form (name + birthdate)
+/share    → Shareable Card + Deep Content (accordions)
+/forecast → Standalone Year Forecast (alternate entry, public)
+```
+
+### State Flow
+
+```
+Landing (/login)
+    │
+    ├─► bypassVerification() → isVerified = true
+    │
+    ▼
+Entry (/enter)
+    │
+    ├─► onUnLock({ name, birthDate, focusArea })
+    │
+    ▼
+Shareable Card (/share)
+    │
+    ├─► Calculate numerology from userData
+    ├─► Generate shareable card
+    ├─► Accordions reveal deeper content on demand
+    │
+    ▼
+[User shares OR explores deeper content]
+```
+
+### Design Principles
+
+1. **Shareable First** — The card is the product, not the app
+2. **Progressive Depth** — Easy entry, depth available for curious
+3. **Instant Payoff** — See your energy immediately after form
+4. **Viral Loop** — Card includes "What's yours?" call-to-action
+5. **Optional Depth** — Deep content in accordions, not forced
+
+---
+
 ## Active Feature Development
 
 ### Feature: WoW/Non-WoW User Path Split
@@ -822,3 +998,232 @@ interface TalismanOrder {
   - Email sequences (order confirmation, shipping, delivery)
   - Customer support documentation
   - **Completion Notes**: _Pending_
+
+---
+
+### Feature: Landing Page Refinement
+
+**Branch**: `feature/wow-non-wow-split`
+**Status**: Completed
+**Updated**: 2025-12-29
+
+#### Landing Page Design Philosophy
+
+The landing page (`LoginPage.tsx`) has been refined to create a more immersive, distraction-free experience that lets the cosmic background and fortune teller guide take center stage.
+
+#### Key Design Decisions
+
+**1. Removed Card Container**
+- The previous design had a glass-effect Card wrapper around the main CTA
+- This was a remnant from the Discord login flow where it made sense to contain login UI
+- For the simplified flow, the card created unnecessary visual separation
+- Content now flows directly on the cosmic background for a more seamless, mystical feel
+
+**2. Removed Info Button (HelpCircle)**
+- Previously had a question mark button that linked to `/info`
+- This was designed to explain WoW wallet connection requirements
+- No longer needed since we removed the WoW-specific flow
+- Users can discover features through the natural flow
+
+**3. Simplified User Flow**
+```
+LoginPage → IndividualReadingPage → ShareableReadingPage
+     ↓
+  (No more path selection)
+```
+
+**4. Content Hierarchy**
+The landing page now presents information in this order:
+1. Logo and title ("The Infinity Compass")
+2. Tagline with mystical positioning
+3. Fortune teller image with random greeting
+4. Three feature highlights (Personal Reading, Year Forecast, Shareable Card)
+5. "Begin My Reading" CTA button
+6. Privacy note (below button, subtle)
+
+#### Current LoginPage Structure
+
+```tsx
+<div className="gradient-bg">
+  {/* Language Toggle - top right */}
+  <LanguageToggle />
+
+  {/* Cosmic particles + Sacred geometry background */}
+
+  {/* Hero: Logo + Title + Tagline */}
+
+  {/* Fortune Teller with floating animation + random greeting */}
+
+  {/* Content Section (motion.div) */}
+  {isDiscordRequired ? (
+    // Discord login flow (legacy, behind flag)
+  ) : (
+    // Simplified flow:
+    // - Feature highlights (3 bullet points)
+    // - "Begin My Reading" button
+    // - Privacy note
+  )}
+
+  {/* Demo Modal + Cookie Consent */}
+</div>
+```
+
+#### Internationalization (i18n)
+
+The landing page now supports multiple languages via `LanguageContext`:
+- All text content uses translation keys (`t.appTitle`, `t.btnBeginReading`, etc.)
+- Greetings array is localized (`t.greetings`)
+- Language toggle component in top-right corner
+- Translations stored in `src/context/LanguageContext.tsx`
+
+#### Feature Highlights
+
+The three features presented on the landing page:
+1. **Personal Reading** — Diamond chart based on name + birth date
+2. **Year Forecast** — Cosmic periods for the year ahead
+3. **Shareable Card** — Social media cards
+
+Each highlight uses a colored star symbol (✦) for visual interest:
+- Pink (#F8A1D1) for Personal Reading
+- Purple (#9B8DE3) for Year Forecast
+- Blue (#6BCFF6) for Shareable Card
+
+#### Discord Login (Legacy)
+
+The Discord login flow is preserved but hidden behind the `isDiscordRequired` flag in AuthContext:
+- When `isDiscordRequired = true`: Shows Discord logo, login button, and demo button
+- When `isDiscordRequired = false`: Shows simplified feature highlights flow
+- Default is `false` for the current public experience
+
+#### Animation Details
+
+- Fortune teller image: Floating animation (y: 0 → -6 → 0, 3s loop)
+- Content section: Fade in from bottom (opacity: 0→1, y: 20→0, 0.6s delay)
+- Greeting text: Delayed fade in (1s delay)
+
+#### Files Modified
+
+- `src/pages/LoginPage.tsx` - Main landing page
+- `src/App.tsx` - Simplified routing (removed path selection requirement)
+- `src/context/LanguageContext.tsx` - Translation strings
+
+---
+
+### Feature: Year Series Forecast
+
+**Branch**: `feature/wow-non-wow-split`
+**Status**: Completed
+**Updated**: 2025-12-29
+
+#### Year Series Overview
+
+The Year Series Forecast is a standalone numerology feature that divides the year into cosmic periods, each with unique energy signatures. Users can access it via `/forecast` without requiring authentication.
+
+#### Core Calculation Logic
+
+The year series calculations are based on three key numbers from the user's numerology profile:
+
+1. **Top Diamond** — Birth day reduced to single digit (e.g., 29 → 11 → 2)
+2. **Bottom Diamond** — Reduced value from diamond lower position
+3. **Column Number** — Sum of all inner diamond values, reduced
+
+These three numbers determine:
+- The sequence of period numbers throughout the year
+- Which years are "chart years" (special significance)
+- How many periods appear in each year type
+
+#### Year Types and Period Counts
+
+| Year Type | Period Count | Description |
+|-----------|--------------|-------------|
+| Before Chart | 11 periods | Standard year before a chart year |
+| Chart Year (with next) | 15 periods | Chart year followed by another chart year |
+| Chart Year (solo) | 13 periods | Chart year not followed by another |
+| After Chart | 11 periods | Standard year after a chart year |
+
+#### Layered Presentation Approach
+
+The YearForecastCard component uses a **layered visual hierarchy**:
+
+```
+┌─────────────────────────────────────────┐
+│  Year Header (2025)                     │
+│  "The Powerhouse Year"                  │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐       │
+│  │  9  │ │  2  │ │11/2 │ │  1  │  ...  │  ← Period Numbers
+│  │     │ │     │ │     │ │     │       │
+│  │Jan  │ │Feb  │ │Mar  │ │Apr  │       │  ← Date Ranges
+│  │1-31 │ │1-28 │ │1-31 │ │1-30 │       │
+│  └─────┘ └─────┘ └─────┘ └─────┘       │
+│                                         │
+│  Current Period Highlight               │  ← Visual emphasis on active period
+│                                         │
+├─────────────────────────────────────────┤
+│  Period Meaning Accordion               │  ← Expandable meanings for each number
+│  └─ 9: "Completion & Release"           │
+│  └─ 2: "Partnership & Balance"          │
+│  └─ etc.                                │
+└─────────────────────────────────────────┘
+```
+
+#### Key UI Components
+
+**YearForecastCard** (`src/components/YearForecastCard.tsx`)
+- Main display component for year forecast
+- Horizontal scrollable period cards
+- Current period highlighting
+- Expandable period meanings
+
+**YearForecastPage** (`src/pages/YearForecastPage.tsx`)
+- Standalone entry page at `/forecast`
+- Name and birth date form
+- "Remember me" localStorage persistence
+- Privacy-focused (data stays on device)
+
+#### Period Number Display
+
+Numbers are displayed with their compound form when applicable:
+- Single digits: `1`, `2`, `3`, etc.
+- Compound numbers: `11/2`, `16/7`, `19/1`, etc.
+
+The compound form shows both the raw sum and the reduced value, which carries numerological significance.
+
+#### Chart Year Calculation
+
+Chart years are calculated from the birth year using a specific pattern:
+```typescript
+getChartYearsForBirthYear(birthYear: number): ChartYearEntry[]
+```
+
+Returns an array of years that have special numerological significance for the user, based on their column number.
+
+#### localStorage Persistence
+
+The YearForecastPage supports optional data persistence:
+- **Key**: `infinity_compass_forecast_data`
+- **Stored**: name, birthDateStr, topDiamond, bottomDiamond, columnNumber, savedAt
+- **Privacy**: Data never leaves the device, explicit opt-in via "Remember me" checkbox
+- **Clear option**: Users can clear stored data with confirmation modal
+
+#### Service Functions
+
+Located in `src/services/yearSeriesService.ts`:
+
+| Function | Purpose |
+|----------|---------|
+| `calculateYearPeriods()` | Get all periods for a specific year |
+| `determineYearType()` | Classify year as before/after/chart year |
+| `getChartYearsForBirthYear()` | Get all chart years for a birth year |
+| `calculateColumnNumber()` | Sum inner diamond values |
+| `extractNumericValue()` | Handle compound number strings |
+| `reduceNumber()` | Reduce to single digit (preserve master numbers) |
+| `getYearTitle()` | Get archetype title for reduced year number |
+
+#### Files
+
+- `src/pages/YearForecastPage.tsx` - Entry page with form
+- `src/components/YearForecastCard.tsx` - Forecast display component
+- `src/services/yearSeriesService.ts` - Calculation logic
+- `src/services/yearSeriesService.test.ts` - Test file with known values

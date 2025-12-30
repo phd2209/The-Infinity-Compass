@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import PathSelectionPage from './pages/PathSelectionPage';
 import IndividualReadingPage from './pages/IndividualReadingPage';
 import ReadingPage from './pages/ReadingPage';
+import CurrentEnergyPage from './pages/CurrentEnergyPage';
 import ShareableReadingPage from './pages/ShareableReadingPage';
 import NumerologyTestPage from './pages/NumerologyTestPage';
 import InfoPage from './pages/InfoPage';
 import YearForecastPage from './pages/YearForecastPage';
+import TalismanPage from './pages/TalismanPage';
 
 interface UserData {
   name: string;
@@ -30,15 +33,23 @@ function PathSelectionPageWrapper() {
 }
 
 function AppRoutes() {
-  const { isVerified, setAuthenticated, userPath } = useAuth();
+  const { isVerified, setAuthenticated } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
+  const navigate = useNavigate();
 
   const handleUnLock = (data: UserData) => {
     setUserData(data);
   };
 
-  const handleBack = () => {
+  // Back from entry page goes to login
+  const handleBackFromEntry = () => {
     setUserData(null);
+    navigate('/login');
+  };
+
+  // Back from profile page goes to current energy
+  const handleBackFromProfile = () => {
+    navigate('/current');
   };
 
   return (
@@ -70,14 +81,10 @@ function AppRoutes() {
           path="/enter"
           element={
             isVerified ? (
-              userPath ? (
-                !userData ? (
-                  <IndividualReadingPage onUnLock={handleUnLock} onBack={handleBack} />
-                ) : (
-                  <Navigate to="/share" replace />
-                )
+              !userData ? (
+                <IndividualReadingPage onUnLock={handleUnLock} onBack={handleBackFromEntry} />
               ) : (
-                <Navigate to="/choose-path" replace />
+                <Navigate to="/current" replace />
               )
             ) : (
               <Navigate to="/login" replace />
@@ -96,11 +103,36 @@ function AppRoutes() {
           }
         />
 
+        {/* Current Energy page - instant payoff moment */}
+        <Route
+          path="/current"
+          element={
+            isVerified && userData ? (
+              <CurrentEnergyPage userData={userData} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Full Profile page - deep dive */}
         <Route
           path="/share"
           element={
             isVerified && userData ? (
-              <ShareableReadingPage userData={userData} onBack={handleBack} />
+              <ShareableReadingPage userData={userData} onBack={handleBackFromProfile} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Talisman product page */}
+        <Route
+          path="/talisman"
+          element={
+            isVerified && userData ? (
+              <TalismanPage userData={userData} />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -125,11 +157,13 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

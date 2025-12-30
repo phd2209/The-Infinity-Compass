@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, birthdate, diamondData, nftId = 'default', showName = false } = req.body;
+  const { name, birthdate, diamondData, nftId = 'default', showName = false, language = 'en' } = req.body;
 
   // Validate required fields
   if (!name || !birthdate || !diamondData) {
@@ -58,8 +58,8 @@ export default async function handler(req, res) {
     const normalizedDate = birthdate.trim();
     const normalizedNftId = nftId.trim();
 
-    // Generate cache key with v2 prefix
-    const cacheKey = `v2:${CacheKeys.reading(
+    // Generate cache key with v2 prefix and language
+    const cacheKey = `v2:${language}:${CacheKeys.reading(
       normalizedName,
       normalizedDate,
       normalizedNftId,
@@ -84,11 +84,12 @@ export default async function handler(req, res) {
     console.log('\n========== DIAMOND DATA RECEIVED ==========');
     console.log('Name:', name);
     console.log('Birthdate:', birthdate);
+    console.log('Language:', language);
     console.log('Diamond Data:', JSON.stringify(diamondData, null, 2));
     console.log('===========================================\n');
 
     // Cache miss - generate new reading with v2 prompt
-    const reading = await generateReadingV2(diamondData);
+    const reading = await generateReadingV2(diamondData, language);
 
     // Store in cache
     cache.set(cacheKey, reading, TTL.READING);
@@ -114,12 +115,12 @@ export default async function handler(req, res) {
  * Generate reading with IMPROVED PROMPT V2
  * Includes expanded fields: loveStyle, careerGifts, spiritualGifts, growthPath, fortuneInsight
  */
-async function generateReadingV2(diamondData) {
+async function generateReadingV2(diamondData, language = 'en') {
   // Check for API key
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey === 'your_openai_api_key_here') {
     console.log('OpenAI API key not configured, returning placeholder data');
-    return getPlaceholderReadingV2();
+    return getPlaceholderReadingV2(language);
   }
 
   try {
@@ -272,6 +273,11 @@ Return exactly this structure:
 
 ---
 
+**LANGUAGE REQUIREMENT:**
+${language === 'da' ? 'IMPORTANT: Write the ENTIRE response in Danish (Dansk). All text must be in Danish - archetype title, tagline, summary, all fields. Use natural, beautiful Danish prose.' : 'Write the response in English.'}
+
+---
+
 **IMPORTANT:** All fields are required. Write in complete, flowing sentences. Make every word count - this is their cosmic story.`;
 
     // DEBUG: Log the complete prompt being sent to OpenAI
@@ -279,12 +285,16 @@ Return exactly this structure:
     console.log(prompt);
     console.log('========================================\n');
 
+    const systemMessage = language === 'da'
+      ? 'Du er en mystisk numerologi-ekspert, der giver personlige, inspirerende indsigter baseret på numerologiske beregninger. Dine svar skal være opløftende, meningsfulde og specifikke for personens tal. Du SKAL returnere gyldig JSON på dansk.'
+      : 'You are a mystical numerology expert who provides personalized, inspiring insights based on numerological calculations. Your responses should be uplifting, meaningful, and specific to the person\'s numbers. You MUST return valid JSON only.';
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
         {
           role: 'system',
-          content: 'You are a mystical numerology expert who provides personalized, inspiring insights based on numerological calculations. Your responses should be uplifting, meaningful, and specific to the person\'s numbers. You MUST return valid JSON only.',
+          content: systemMessage,
         },
         {
           role: 'user',
@@ -292,7 +302,7 @@ Return exactly this structure:
         },
       ],
       response_format: { type: "json_object" }, // Force valid JSON output
-      max_tokens: 700, // Increased for expanded fields
+      max_tokens: 800, // Increased for expanded fields + Danish text
       temperature: 0.7,
     });
 
@@ -326,14 +336,32 @@ Return exactly this structure:
     };
   } catch (error) {
     console.error('Error generating reading v2:', error);
-    return getPlaceholderReadingV2();
+    return getPlaceholderReadingV2(language);
   }
 }
 
 /**
  * Placeholder reading for fallback (v2 with expanded fields)
  */
-function getPlaceholderReadingV2() {
+function getPlaceholderReadingV2(language = 'en') {
+  if (language === 'da') {
+    return {
+      archetype: {
+        title: 'Den Kosmiske Vandrer',
+        tagline: 'Du vandrer mellem verdener med visdom og ynde.',
+      },
+      oneLiner: 'Dit kosmiske fingeraftryk afslører en naturlig leder med dyb spirituel visdom.',
+      summary: 'Du er bestemt til betydelig personlig transformation og vækst. Din naturlige karisma tiltrækker muligheder for lederroller, og dine intuitive gaver guider dig gennem livets rejse. Stol på din indre visdom, da den belyser din vej fremad.',
+      highlightWords: ['Lederskab', 'Visdom', 'Transformation', 'Intuition', 'Karisma'],
+      visualCue: ['✨', '🌟', '🔮'],
+      loveStyle: 'Du bringer magnetisk tilstedeværelse og dyb følelsesmæssig visdom til dine relationer. Dine partnere tiltrækkes af din autentiske natur og din evne til at skabe helligt rum for ægte forbindelse.',
+      careerGifts: 'Du udmærker dig i roller, der giver dig mulighed for at lede med vision og inspirere andre til transformation. Din naturlige karisma og strategiske tænkning gør dig til en kraftfuld kraft i enhver professionel sammenhæng.',
+      spiritualGifts: 'Du besidder medfødte intuitive evner, der gør det muligt for dig at opfatte sandheder under overfladen. Din forbindelse til universel visdom guider dig i både personlige og kollektive anliggender.',
+      growthPath: 'Din sjælerejse involverer at lære at balancere din kraftfulde tilstedeværelse med sårbarhed, og opdage at sand styrke kommer fra at omfavne alle aspekter af dig selv.',
+      fortuneInsight: 'Kosmos er på linje med dig i tider med modige handlinger. Stol på tegnene og synkroniteterne, der viser sig på din vej.',
+    };
+  }
+
   return {
     archetype: {
       title: 'The Cosmic Wanderer',

@@ -34,7 +34,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [wowNFTs, setWowNFTsState] = useState<NFT[]>([]);
   const [selectedNFT, setSelectedNFTState] = useState<NFT | null>(null);
-  const [userPath, setUserPathState] = useState<'wow' | 'non-wow' | null>(null);
+  // Default to 'non-wow' for simplified flow (skip wallet/NFT selection)
+  const [userPath, setUserPathState] = useState<'wow' | 'non-wow' | null>('non-wow');
   const [generatedAvatar, setGeneratedAvatarState] = useState<string | null>(null);
 
   const isDiscordRequired = FEATURES.DISCORD_VERIFICATION_REQUIRED;

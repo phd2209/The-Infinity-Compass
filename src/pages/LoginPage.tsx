@@ -1,34 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { HelpCircle, Eye, ArrowRight } from 'lucide-react';
+import { Eye, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { getDiscordAuthUrl } from '@/config/discord';
 import { DemoModal } from '@/components/DemoModal';
 import { CookieConsent } from '@/components/CookieConsent';
 import { useAuth } from '@/context/AuthContext';
-// import { NumerologyLogo } from '@/components/NumerologyLogo';
-
-const FORTUNE_TELLER_GREETINGS = [
-  "I've been expecting you...",
-  "The stars whisper your arrival.",
-  "Every soul must walk its path — yours begins here.",
-  "Your cosmic journey awaits beyond this threshold.",
-  "The universe has guided you to this moment."
-];
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { isDiscordRequired, bypassVerification } = useAuth();
+  const { t, language, setLanguage } = useLanguage();
   const [greeting, setGreeting] = useState('');
   const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   useEffect(() => {
     // Select random greeting on mount
-    const randomGreeting = FORTUNE_TELLER_GREETINGS[Math.floor(Math.random() * FORTUNE_TELLER_GREETINGS.length)];
+    const randomGreeting = t.greetings[Math.floor(Math.random() * t.greetings.length)];
     setGreeting(randomGreeting);
-  }, []);
+  }, [t.greetings]);
 
   const handleDiscordLogin = () => {
     // Redirect to Discord OAuth2 authorization
@@ -36,9 +28,9 @@ export default function LoginPage() {
   };
 
   const handleEnter = () => {
-    // Bypass verification and navigate to path selection
+    // Bypass verification and go directly to the reading form
     bypassVerification();
-    navigate('/choose-path');
+    navigate('/enter');
   };
 
   return (
@@ -154,7 +146,7 @@ export default function LoginPage() {
               className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-[#9B8DE3] via-[#F8A1D1] to-[#6BCFF6] bg-clip-text text-transparent"
               style={{ fontFamily: "'Cinzel', serif" }}
             >
-              The Infinity Compass
+              {t.appTitle}
             </h1>
           </div>
 
@@ -162,7 +154,7 @@ export default function LoginPage() {
             className="text-xl md:text-2xl text-[#F4E8DC] italic leading-relaxed"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            "Discover your numerology blueprint in harmony with your World of Women energy."
+            "{t.appTagline}"
           </p>
         </div>
 
@@ -188,135 +180,173 @@ export default function LoginPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="text-[#F4E8DC]/80 italic text-base md:text-lg"
+            className="text-[#F4E8DC]/80 italic text-lg md:text-xl"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             {greeting}
           </motion.p>
         </motion.div>
 
-        {/* Login Card with Info Button */}
-        <Card className="glass-effect mystical-glow w-full max-w-md p-8 space-y-6 bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-[#9B8DE3]/40 relative">
-          {/* Subtle Info Button - Inside card at top-right */}
-          <button
-            onClick={() => navigate('/info')}
-            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#1D1B3A]/60 backdrop-blur-sm border border-[#9B8DE3]/30 hover:border-[#F8A1D1]/60 hover:bg-[#1D1B3A]/80 transition-all duration-300 flex items-center justify-center group hover:shadow-[0_0_20px_rgba(155,141,227,0.3)] cursor-pointer"
-            aria-label="Learn more about The Fortune Teller"
-          >
-            <HelpCircle className="w-4 h-4 text-[#9B8DE3]/70 group-hover:text-[#F8A1D1] transition-colors" />
-          </button>
-
-          <div className="text-center space-y-4">
-            {isDiscordRequired ? (
-              <>
-                {/* Discord logo */}
-                <div className="flex justify-center mb-4">
-                  <svg
-                    className="w-16 h-16"
-                    viewBox="0 0 71 55"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"
-                      fill="#9B8DE3"
-                    />
-                  </svg>
-                </div>
-
-                <h2
-                  className="text-2xl font-semibold text-[#F4E8DC]"
-                  style={{ fontFamily: "'Cinzel', serif" }}
+        {/* Content Section - Direct on background */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="w-full max-w-md text-center space-y-6"
+        >
+          {isDiscordRequired ? (
+            <>
+              {/* Discord logo */}
+              <div className="flex justify-center mb-4">
+                <svg
+                  className="w-16 h-16"
+                  viewBox="0 0 71 55"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  Login with Discord to verify you're a World of Women holder.
-                </h2>
+                  <path
+                    d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"
+                    fill="#9B8DE3"
+                  />
+                </svg>
+              </div>
 
-                <Button
-                  onClick={handleDiscordLogin}
-                  data-discord-login
-                  className="w-full cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  <svg
-                    className="w-6 h-6 mr-3"
-                    viewBox="0 0 71 55"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"
-                      fill="white"
-                    />
-                  </svg>
-                  Login with Discord
-                </Button>
-              </>
-            ) : (
-              <>
-                <h2
-                  className="text-2xl font-semibold text-[#F4E8DC] mb-4"
-                  style={{ fontFamily: "'Cinzel', serif" }}
-                >
-                  Begin Your Numerology Journey
-                </h2>
+              <h2
+                className="text-2xl font-semibold text-[#F4E8DC]"
+                style={{ fontFamily: "'Cinzel', serif" }}
+              >
+                {t.discordLoginTitle}
+              </h2>
 
-                <p
-                  className="text-base text-[#F4E8DC]/80 mb-6"
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              <Button
+                onClick={handleDiscordLogin}
+                data-discord-login
+                className="w-full cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <svg
+                  className="w-6 h-6 mr-3"
+                  viewBox="0 0 71 55"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  Discover your cosmic blueprint through the ancient wisdom of numbers.
-                </p>
+                  <path
+                    d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"
+                    fill="white"
+                  />
+                </svg>
+                {t.btnLoginDiscord}
+              </Button>
 
-                <Button
-                  onClick={handleEnter}
-                  className="w-full cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  <ArrowRight className="w-6 h-6 mr-2" />
-                  Enter
-                </Button>
-              </>
-            )}
-
-            {/* See Demo Button - Only show when Discord is required */}
-            {isDiscordRequired && (
+              {/* See Demo Button */}
               <Button
                 onClick={() => setIsDemoOpen(true)}
                 variant="outline"
-                className="w-full cursor-pointer bg-transparent border-2 border-[#9B8DE3]/50 hover:border-[#F8A1D1]/70 hover:bg-[#9B8DE3]/10 text-[#F4E8DC] hover:text-white font-medium py-5 text-base transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(155,141,227,0.3)] mt-3"
+                className="w-full cursor-pointer bg-transparent border-2 border-[#9B8DE3]/50 hover:border-[#F8A1D1]/70 hover:bg-[#9B8DE3]/10 text-[#F4E8DC] hover:text-white font-medium py-5 text-base transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(155,141,227,0.3)]"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
                 <Eye className="w-5 h-5 mr-2" />
-                See How It Works (no login)
+                {t.btnSeeDemo}
               </Button>
-            )}
 
-            <div className="space-y-2">
-              {isDiscordRequired && (
+              <div className="space-y-2 pt-2">
                 <p
                   className="text-xs text-[#F4E8DC]/70"
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
-                  Discord verification is read-only — we only check your WoW holder role
+                  {t.discordReadOnly}
                 </p>
-              )}
-              <p
-                className="text-xs text-[#F4E8DC]/70"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                Your reading data stays private and is never stored or shared
-              </p>
-              {isDiscordRequired && (
+                <p
+                  className="text-xs text-[#F4E8DC]/70"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {t.privacyNote}
+                </p>
                 <p
                   className="text-xs text-[#F4E8DC]/60 mt-3"
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
-                  💡 Tip: Use your main browser where you're already logged into Discord
+                  {t.discordBrowserNote}
                 </p>
-              )}
-            </div>
-          </div>
-        </Card>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Feature highlights */}
+              <div className="text-left space-y-3 mb-6">
+                <div className="flex items-start gap-3">
+                  <span className="text-[#F8A1D1] text-lg">✦</span>
+                  <p className="text-base text-[#F4E8DC]/80" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <span className="text-[#F4E8DC] font-medium">{t.featurePersonalTitle}</span> — {t.featurePersonalDesc}
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-[#9B8DE3] text-lg">✦</span>
+                  <p className="text-base text-[#F4E8DC]/80" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <span className="text-[#F4E8DC] font-medium">{t.featureYearTitle}</span> — {t.featureYearDesc}
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-[#6BCFF6] text-lg">✦</span>
+                  <p className="text-base text-[#F4E8DC]/80" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <span className="text-[#F4E8DC] font-medium">{t.featureShareableTitle}</span> — {t.featureShareableDesc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Language Selection */}
+              <div className="mb-6">
+                <p
+                  className="text-sm text-[#F4E8DC]/70 mb-3 text-center"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {language === 'da' ? 'Vælg din oplevelse' : 'Choose your experience'}
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
+                      language === 'en'
+                        ? 'border-[#9B8DE3] bg-[#9B8DE3]/20 text-[#F4E8DC]'
+                        : 'border-[#9B8DE3]/30 bg-transparent text-[#F4E8DC]/60 hover:border-[#9B8DE3]/50 hover:text-[#F4E8DC]/80'
+                    }`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    <span className="font-medium">English</span>
+                  </button>
+                  <button
+                    onClick={() => setLanguage('da')}
+                    className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
+                      language === 'da'
+                        ? 'border-[#F8A1D1] bg-[#F8A1D1]/20 text-[#F4E8DC]'
+                        : 'border-[#F8A1D1]/30 bg-transparent text-[#F4E8DC]/60 hover:border-[#F8A1D1]/50 hover:text-[#F4E8DC]/80'
+                    }`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    <span className="font-medium">Dansk</span>
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleEnter}
+                className="w-full cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <ArrowRight className="w-6 h-6 mr-2" />
+                {t.btnBeginReading}
+              </Button>
+
+              {/* Privacy note below button */}
+              <p
+                className="text-xs text-[#F4E8DC]/60 pt-4"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                {t.privacyNote}
+              </p>
+            </>
+          )}
+        </motion.div>
       </div>
 
       {/* Demo Modal */}

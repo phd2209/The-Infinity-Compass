@@ -16,8 +16,53 @@ interface YearEntry {
   value: number;
 }
 
-// Column 2 (3rd column - contains 1975, verified correct)
-// TODO: Add other columns once we verify the calculation logic works
+// Column 0 (1st column)
+const COLUMN_0: YearEntry[] = [
+  { year: 1900, value: 1 }, { year: 1901, value: 2 }, { year: 1903, value: 4 },
+  { year: 1907, value: 8 },
+  { year: 1915, value: 7 },
+  { year: 1922, value: 5 },
+  { year: 1927, value: 1 }, { year: 1928, value: 2 }, { year: 1930, value: 4 },
+  { year: 1934, value: 8 },
+  { year: 1942, value: 7 },
+  { year: 1949, value: 5 },
+  { year: 1954, value: 1 }, { year: 1955, value: 2 }, { year: 1957, value: 4 },
+  { year: 1961, value: 8 },
+  { year: 1969, value: 7 },
+  { year: 1976, value: 5 },
+  { year: 1981, value: 1 }, { year: 1982, value: 2 }, { year: 1984, value: 4 },
+  { year: 1988, value: 8 },
+  { year: 1996, value: 7 },
+  { year: 2003, value: 5 },
+  { year: 2008, value: 1 }, { year: 2009, value: 2 }, { year: 2011, value: 4 },
+  { year: 2015, value: 8 },
+  { year: 2023, value: 7 },
+  { year: 2030, value: 5 },
+  { year: 2035, value: 1 }, { year: 2036, value: 2 }, { year: 2038, value: 4 },
+  { year: 2042, value: 8 }
+];
+
+// Column 1 (2nd column)
+const COLUMN_1: YearEntry[] = [
+  { year: 1904, value: 5 },
+  { year: 1909, value: 1 }, { year: 1910, value: 2 }, { year: 1912, value: 4 }, { year: 1916, value: 8 },
+  { year: 1924, value: 7 },
+  { year: 1931, value: 5 },
+  { year: 1936, value: 1 }, { year: 1937, value: 2 }, { year: 1939, value: 4 }, { year: 1943, value: 8 },
+  { year: 1951, value: 7 },
+  { year: 1958, value: 5 },  
+  { year: 1963, value: 1 }, { year: 1964, value: 2 }, { year: 1966, value: 4 }, { year: 1970, value: 8 },
+  { year: 1978, value: 7 },
+  { year: 1985, value: 5 },  
+  { year: 1990, value: 1 }, { year: 1991, value: 2 }, { year: 1993, value: 4 }, { year: 1997, value: 8 },
+  { year: 2005, value: 7 },
+  { year: 2012, value: 5 },
+  { year: 2017, value: 1 }, { year: 2018, value: 2 }, { year: 2020, value: 4 }, { year: 2024, value: 8 },
+  { year: 2032, value: 7 },
+  { year: 2039, value: 5 }
+];
+
+// Column 2 (3rd column)
 const COLUMN_2: YearEntry[] = [
   { year: 1906, value: 7 },
   { year: 1913, value: 5 },
@@ -41,6 +86,54 @@ const COLUMN_2: YearEntry[] = [
   { year: 2033, value: 8 },
   { year: 2041, value: 7 },
 ];
+
+// Column 3 (4th column)
+const COLUMN_3: YearEntry[] = [
+  { year: 1902, value: 3 },
+  { year: 1905, value: 6 },
+  { year: 1911, value: 3 }, { year: 1914, value: 6 },
+  { year: 1920, value: 3 },
+  { year: 1923, value: 6 },
+  { year: 1929, value: 3 }, { year: 1932, value: 6 },
+  { year: 1938, value: 3 }, { year: 1941, value: 6 },
+  { year: 1947, value: 3 },
+  { year: 1950, value: 6 },
+  { year: 1956, value: 3 }, { year: 1959, value: 6 },
+  { year: 1965, value: 3 }, { year: 1968, value: 6 },
+  { year: 1974, value: 3 },
+  { year: 1977, value: 6 },
+  { year: 1983, value: 3 }, { year: 1986, value: 6 },
+  { year: 1992, value: 3 }, { year: 1995, value: 6 },
+  { year: 2001, value: 3 },
+  { year: 2004, value: 6 },
+  { year: 2010, value: 3 }, { year: 2013, value: 6 },
+  { year: 2019, value: 3 }, { year: 2022, value: 6 },
+  { year: 2028, value: 3 },
+  { year: 2031, value: 6 },
+  { year: 2037, value: 3 }, { year: 2040, value: 6 }
+];
+
+// Column 4 (5th column)
+const COLUMN_4: YearEntry[] = [
+  { year: 1908, value: 9 },
+  { year: 1917, value: 9 },
+  { year: 1926, value: 9 },
+  { year: 1935, value: 9 },
+  { year: 1944, value: 9 },
+  { year: 1953, value: 9 },
+  { year: 1962, value: 9 },
+  { year: 1971, value: 9 },
+  { year: 1980, value: 9 },
+  { year: 1989, value: 9 },
+  { year: 1998, value: 9 },
+  { year: 2007, value: 9 },
+  { year: 2016, value: 9 },
+  { year: 2025, value: 9 },
+  { year: 2034, value: 9 },
+  { year: 2043, value: 9 }
+];
+
+
 
 // Period date ranges for different period counts
 type PeriodDateRange = [number, number, number, number]; // [startMonth, startDay, endMonth, endDay]
@@ -132,13 +225,24 @@ export const formatCompound = (num: number): string => {
  * For now, only column 2 (containing 1975) is implemented
  */
 export const getChartYearsForBirthYear = (birthYear: number): YearEntry[] => {
-  // TODO: Implement column detection for all columns
-  // For now, return column 2 if birth year is in it, empty otherwise
+  // Check which column contains this birth year
+  if (COLUMN_0.some(e => e.year === birthYear)) {
+    return COLUMN_0;
+  }
+  if (COLUMN_1.some(e => e.year === birthYear)) {
+    return COLUMN_1;
+  }
   if (COLUMN_2.some(e => e.year === birthYear)) {
     return COLUMN_2;
   }
-  // Temporary: return column 2 for testing
-  return COLUMN_2;
+  if (COLUMN_3.some(e => e.year === birthYear)) {
+    return COLUMN_3;
+  }
+  if (COLUMN_4.some(e => e.year === birthYear)) {
+    return COLUMN_4;
+  }
+  // If birth year not found in any column, return empty array
+  return [];
 };
 
 /**

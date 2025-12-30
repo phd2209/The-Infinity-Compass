@@ -32,7 +32,13 @@ export interface BirthdayInterpretation {
 export interface CompoundNumberInterpretation {
   number: string;
   caption: string;
+  captionDa?: string; // Danish caption
   description: string;
+  descriptionDa?: string; // Danish full description
+  shortDescription?: string; // 2-3 sentence summary (English)
+  shortDescriptionDa?: string; // Danish short description
+  actionTip?: string; // How to work with this energy (English)
+  actionTipDa?: string; // Danish action tip
   category: number; // The base number (1-9)
 }
 
@@ -150,169 +156,442 @@ export const getBirthdayInterpretation = (birthdayNumber: number): BirthdayInter
 };
 
 // Compound number interpretations from "de højere sammensatte tal"
+// Also includes single numbers (1-9) for when the energy period is a base number
 const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation> = {
+  // Single numbers (1-9) - base energies
+  "1": {
+    number: "1",
+    caption: "The Leader",
+    captionDa: "Lederen",
+    description: "The number 1 represents leadership, independence, and new beginnings. It is the energy of initiators and pioneers who forge their own path.",
+    descriptionDa: "Tallet 1 repræsenterer lederskab, uafhængighed og nye begyndelser. Det er energien fra initiativtagere og pionerer der former deres egen vej.",
+    shortDescription: "Leadership energy surges through you. You'll feel a strong urge for independence and a drive to forge new paths. Pioneer spirit awakens, calling you to step forward boldly.",
+    shortDescriptionDa: "Lederskabsenergi strømmer gennem dig. Du vil føle en stærk trang til uafhængighed og en drivkraft til at skabe nye veje. Pionérånd vågner og kalder dig til at træde modigt frem.",
+    actionTip: "Take initiative. Start that project you've been thinking about—now is the time to lead.",
+    actionTipDa: "Tag initiativ. Start det projekt du har tænkt på—nu er tiden til at lede.",
+    category: 1
+  },
+  "2": {
+    number: "2",
+    caption: "The Diplomat",
+    captionDa: "Diplomaten",
+    description: "The number 2 represents partnership, balance, and harmony. It is the energy of cooperation, sensitivity, and finding common ground.",
+    descriptionDa: "Tallet 2 repræsenterer partnerskab, balance og harmoni. Det er energien af samarbejde, sensitivitet og at finde fælles grund.",
+    shortDescription: "Sensitivity heightens and you'll feel drawn toward others. Partnership energy flows strongly—expect to crave harmony, connection, and cooperation. Emotions may feel more tender than usual.",
+    shortDescriptionDa: "Sensitiviteten øges og du vil føle dig draget mod andre. Partnerskabsenergi flyder stærkt—forvent at længes efter harmoni, forbindelse og samarbejde. Følelser kan føles mere ømme end sædvanligt.",
+    actionTip: "Collaborate rather than compete. Your sensitivity is a strength—use it to build bridges.",
+    actionTipDa: "Samarbejd frem for at konkurrere. Din sensitivitet er en styrke—brug den til at bygge broer.",
+    category: 2
+  },
+  "3": {
+    number: "3",
+    caption: "The Creator",
+    captionDa: "Skaberen",
+    description: "The number 3 represents creativity, self-expression, and joy. It is the energy of artists, communicators, and those who bring ideas to life.",
+    descriptionDa: "Tallet 3 repræsenterer kreativitet, selvudtryk og glæde. Det er energien fra kunstnere, kommunikatorer og dem der bringer idéer til live.",
+    shortDescription: "Creative energy bubbles up from within. You'll feel joyful, expressive, and inspired to communicate. Ideas flow freely and a playful, artistic spirit takes hold.",
+    shortDescriptionDa: "Kreativ energi bobler op indefra. Du vil føle dig glad, udtryksfuld og inspireret til at kommunikere. Idéer flyder frit og en legende, kunstnerisk ånd tager over.",
+    actionTip: "Create something! Express yourself through art, words, or any medium that calls to you.",
+    actionTipDa: "Skab noget! Udtryk dig selv gennem kunst, ord eller et hvilket som helst medie der kalder på dig.",
+    category: 3
+  },
+  "4": {
+    number: "4",
+    caption: "The Builder",
+    captionDa: "Bygmesteren",
+    description: "The number 4 represents stability, hard work, and building solid foundations. It is the energy of discipline, structure, and practical achievement.",
+    descriptionDa: "Tallet 4 repræsenterer stabilitet, hårdt arbejde og at bygge solide fundamenter. Det er energien af disciplin, struktur og praktisk opnåelse.",
+    shortDescription: "Grounding energy anchors you to practical reality. You'll feel a strong pull toward stability, structure, and methodical progress. Hard work feels natural and foundations solidify.",
+    shortDescriptionDa: "Jordende energi forankrer dig i praktisk virkelighed. Du vil føle et stærkt træk mod stabilitet, struktur og metodisk fremgang. Hårdt arbejde føles naturligt og fundamenter bliver solide.",
+    actionTip: "Create structure in your life. Lay the groundwork now for what you want to build.",
+    actionTipDa: "Skab struktur i dit liv. Læg grundlaget nu for hvad du vil bygge.",
+    category: 4
+  },
+  "5": {
+    number: "5",
+    caption: "The Adventurer",
+    captionDa: "Eventyreren",
+    description: "The number 5 represents freedom, change, and adventure. It is the energy of explorers, communicators, and those who embrace new experiences.",
+    descriptionDa: "Tallet 5 repræsenterer frihed, forandring og eventyr. Det er energien fra opdagelsesrejsende, kommunikatorer og dem der omfavner nye oplevelser.",
+    shortDescription: "Restless, adventurous energy stirs within. You'll feel a craving for freedom, change, and new experiences. Routine feels stifling as the urge to explore takes over.",
+    shortDescriptionDa: "Rastløs, eventyrlystent energi rører sig indeni. Du vil føle en længsel efter frihed, forandring og nye oplevelser. Rutine føles kvælende mens trangen til at udforske tager over.",
+    actionTip: "Say yes to adventure. Break free from routine and explore something new.",
+    actionTipDa: "Sig ja til eventyr. Bryd fri fra rutinen og udforsk noget nyt.",
+    category: 5
+  },
+  "6": {
+    number: "6",
+    caption: "The Nurturer",
+    captionDa: "Omsorgsgiveren",
+    description: "The number 6 represents love, family, and responsibility. It is the energy of caregivers, healers, and those who create harmony in the home.",
+    descriptionDa: "Tallet 6 repræsenterer kærlighed, familie og ansvar. Det er energien fra omsorgsgivere, healere og dem der skaber harmoni i hjemmet.",
+    shortDescription: "Nurturing, loving energy fills your heart. You'll feel deeply connected to family, home, and those you care for. A strong sense of responsibility and desire for harmony arises.",
+    shortDescriptionDa: "Nærende, kærlig energi fylder dit hjerte. Du vil føle dig dybt forbundet med familie, hjem og dem du holder af. En stærk følelse af ansvar og ønske om harmoni opstår.",
+    actionTip: "Nurture your relationships. Create beauty and harmony in your home and community.",
+    actionTipDa: "Plej dine relationer. Skab skønhed og harmoni i dit hjem og fællesskab.",
+    category: 6
+  },
+  "7": {
+    number: "7",
+    caption: "The Seeker",
+    captionDa: "Søgeren",
+    description: "The number 7 represents spirituality, introspection, and wisdom. It is the energy of philosophers, seekers, and those on a quest for deeper truth.",
+    descriptionDa: "Tallet 7 repræsenterer spiritualitet, introspektion og visdom. Det er energien fra filosoffer, søgere og dem på en søgen efter dybere sandhed.",
+    shortDescription: "Introspective, spiritual energy draws you inward. You'll feel a deep pull toward solitude, contemplation, and seeking truth. Questions about meaning and purpose arise naturally.",
+    shortDescriptionDa: "Introspektiv, spirituel energi trækker dig indad. Du vil føle et dybt træk mod ensomhed, kontemplation og søgen efter sandhed. Spørgsmål om mening og formål opstår naturligt.",
+    actionTip: "Go within. Meditate, study, and trust your intuition to guide you to deeper understanding.",
+    actionTipDa: "Gå indad. Mediter, studer og stol på din intuition til at guide dig til dybere forståelse.",
+    category: 7
+  },
+  "8": {
+    number: "8",
+    caption: "The Achiever",
+    captionDa: "Opnåeren",
+    description: "The number 8 represents abundance, power, and material success. It is the energy of executives, entrepreneurs, and those who manifest wealth.",
+    descriptionDa: "Tallet 8 repræsenterer overflod, magt og materiel succes. Det er energien fra ledere, iværksættere og dem der manifesterer velstand.",
+    shortDescription: "Powerful, ambitious energy activates your drive for success. You'll feel focused on achievement, material goals, and manifesting abundance. Authority and personal power strengthen.",
+    shortDescriptionDa: "Kraftfuld, ambitiøs energi aktiverer din drivkraft for succes. Du vil føle dig fokuseret på opnåelse, materielle mål og at manifestere overflod. Autoritet og personlig magt styrkes.",
+    actionTip: "Think big and take action. Your efforts toward success are supported now.",
+    actionTipDa: "Tænk stort og tag handling. Dine bestræbelser mod succes er støttet nu.",
+    category: 8
+  },
+  "9": {
+    number: "9",
+    caption: "The Humanitarian",
+    captionDa: "Humanisten",
+    description: "The number 9 represents completion, wisdom, and service to humanity. It is the energy of those who give selflessly and see the bigger picture.",
+    descriptionDa: "Tallet 9 repræsenterer fuldendelse, visdom og tjeneste for menneskeheden. Det er energien fra dem der giver uselvisk og ser det større billede.",
+    shortDescription: "Completion energy sweeps through—cycles are ending and wisdom deepens. You'll feel compassionate, expansive, and drawn toward serving something greater than yourself.",
+    shortDescriptionDa: "Fuldendelsesenergi skyller igennem—cyklusser slutter og visdom dybnes. Du vil føle dig medfølende, ekspansiv og draget mod at tjene noget større end dig selv.",
+    actionTip: "Complete what you've started. Let go of the old to make space for the new.",
+    actionTipDa: "Fuldfør hvad du har startet. Slip det gamle for at gøre plads til det nye.",
+    category: 9
+  },
+  // Compound numbers (10 and above)
   "10/1": {
     number: "10/1",
     caption: "The Wheel of Fate / Wheel of Fortune",
+    captionDa: "Skæbnens Hjul / Lykkens Hjul",
     description: "A vibration that deals with luck, being loved and guided by the cosmos. In balance one is lucky, optimistic and loved. In imbalance one can become flighty, stressed and hyperactive as well as experience being 'loved or hated'. (e.g. If there are too many wheels of fortune or it 'spins' with a bad number)",
+    descriptionDa: "En vibration der handler om held, at være elsket og guidet af kosmos. I balance er man heldig, optimistisk og elsket. I ubalance kan man blive flagrende, stresset og hyperaktiv samt opleve at være 'elsket eller hadet'.",
+    shortDescription: "Luck and cosmic favor surround you. You'll feel optimistic, loved, and guided by unseen forces. Opportunities appear seemingly out of nowhere—fortune is spinning in your direction.",
+    shortDescriptionDa: "Held og kosmisk gunst omgiver dig. Du vil føle dig optimistisk, elsket og guidet af usynlige kræfter. Muligheder dukker op tilsyneladende ud af ingenting—lykken spinner i din retning.",
+    actionTip: "Say yes to new opportunities. Trust your instincts and take bold action when doors open.",
+    actionTipDa: "Sig ja til nye muligheder. Stol på din intuition og tag modige skridt når døre åbner sig.",
     category: 1
   },
   "19/1": {
     number: "19/1",
     caption: "Prince of Heaven",
+    captionDa: "Himmelens Prins",
     description: "A vibration that is also called 'everything one touches turns to gold/success'. Exceptional drive, luck and winner mentality, pure thoughts and a pure heart. In balance one is lucky, guided and successful. In imbalance one can be selfish, spoiled and childish.",
+    descriptionDa: "En vibration der også kaldes 'alt man rører ved bliver til guld/succes'. Enestående drivkraft, held og vindermentalitet, rene tanker og et rent hjerte. I balance er man heldig, guidet og succesfuld. I ubalance kan man være egoistisk, forkælet og barnlig.",
+    shortDescription: "Golden, blessed energy flows through you. Everything you touch seems to succeed. You'll feel a pure-hearted drive and winner mentality—success comes naturally now.",
+    shortDescriptionDa: "Gylden, velsignet energi flyder gennem dig. Alt du rører ved synes at lykkes. Du vil føle en rendjertet drivkraft og vindermentalitet—succes kommer naturligt nu.",
+    actionTip: "Lead with your heart. Your natural charisma opens doors—use it for good.",
+    actionTipDa: "Led med dit hjerte. Din naturlige karisma åbner døre—brug den til noget godt.",
     category: 1
   },
   "28/1": {
     number: "28/1",
-    caption: "",
+    caption: "The Broken Promise",
+    captionDa: "Det Brudte Løfte",
     description: "A vibration that deals with big promises that come to nothing, and also potentially deals with lawsuits and conflict. One promises more than one keeps, being deceitful or a 'faker'. Trust in the wrong people who do not wish one well. Loss, tears, starting over",
+    descriptionDa: "En vibration der handler om store løfter der ikke bliver til noget, og potentielt handler om retssager og konflikt. Man lover mere end man holder, er bedragerisk eller en 'faker'. Tillid til de forkerte mennesker der ikke ønsker én godt. Tab, tårer, at starte forfra.",
+    shortDescription: "Cautionary energy surrounds commitments. You may encounter empty promises or feel the weight of unfulfilled expectations. Trust issues and potential disappointments linger in the air.",
+    shortDescriptionDa: "Advarselsenergier omgiver forpligtelser. Du kan støde på tomme løfter eller føle vægten af uopfyldte forventninger. Tillidsproblemer og potentielle skuffelser hænger i luften.",
+    actionTip: "Only promise what you can deliver. Verify others' intentions before investing your trust.",
+    actionTipDa: "Lov kun hvad du kan holde. Verificer andres intentioner før du investerer din tillid.",
     category: 1
   },
   "37/1": {
     number: "37/1",
-    caption: "",
+    caption: "The Rising Star",
+    captionDa: "Den Stigende Stjerne",
     description: "A vibration that gives a 'celebrity' vibe, and is about the courage and self-confidence to stand by oneself, live out one's dreams and step forward as who one is. In balance one is respected and admired and has a good love and sex life and enormous charisma. Luck in friendships, business and everything with money. In imbalance one can be surrounded by drama, scandals, financial and relationship problems.",
+    descriptionDa: "En vibration der giver en 'kendis' vibe, og handler om modet og selvtilliden til at stå ved sig selv, leve sine drømme ud og træde frem som den man er. I balance er man respekteret og beundret med et godt kærlighedsliv og enorm karisma. Held i venskaber, forretning og alt med penge. I ubalance kan man være omgivet af drama, skandaler, økonomiske og relationsproblemer.",
+    shortDescription: "Celebrity energy radiates from you. You'll feel magnetic, admired, and drawn to step into the spotlight. Charisma intensifies and attention naturally flows your way.",
+    shortDescriptionDa: "Kendis-energi stråler fra dig. Du vil føle dig magnetisk, beundret og draget mod at træde ind i rampelyset. Karisma intensiveres og opmærksomhed flyder naturligt din vej.",
+    actionTip: "Be authentically you. Share your unique gifts boldly—the world is ready to receive them.",
+    actionTipDa: "Vær autentisk dig selv. Del dine unikke gaver modigt—verden er klar til at modtage dem.",
     category: 1
   },
   "46/1": {
     number: "46/1",
     caption: "The World Transformer",
+    captionDa: "Verdensforvandleren",
     description: "A vibration that deals with improving and transforming the surroundings for the common good, and breaking through in one's career, often with large projects and philanthropic ideas. In balance one has great leadership abilities, charisma, strength and political acumen. One wants to change the world with 'peace, love & harmony'. Luck in money, love and friendships. In imbalance there is a tendency to skip necessary steps and radiate a superficial 'glamorous image' vibe.",
+    descriptionDa: "En vibration der handler om at forbedre og transformere omgivelserne til fælles bedste, og gennembrud i karrieren, ofte med store projekter og filantropiske idéer. I balance har man store lederevner, karisma, styrke og politisk sans. Man vil forandre verden med 'fred, kærlighed og harmoni'. Held i penge, kærlighed og venskaber. I ubalance er der tendens til at springe nødvendige trin over og udstråle en overfladisk 'glamour' vibe.",
+    shortDescription: "Visionary, transformative energy awakens. You'll feel called to improve the world around you with philanthropic ideals. Leadership abilities strengthen alongside a desire for meaningful change.",
+    shortDescriptionDa: "Visionær, transformerende energi vågner. Du vil føle dig kaldet til at forbedre verden omkring dig med filantropiske idealer. Lederevner styrkes sammen med et ønske om meningsfuld forandring.",
+    actionTip: "Think big but act step by step. Your philanthropic ideas deserve solid foundations.",
+    actionTipDa: "Tænk stort men handl skridt for skridt. Dine filantropiske idéer fortjener solide fundamenter.",
     category: 1
   },
   "55/1": {
     number: "55/1",
     caption: "The Communication Master",
+    captionDa: "Kommunikationsmesteren",
     description: "A vibration that deals with reaching the top by becoming a master of communication. 55 is a master number (two of the same number) which means it takes time to master the number. In balance it's about having a huge radiance that gives success with media and various communication channels and achieving great success. Luck in money, friendships, love. In imbalance it's very much about going after what one wants at any cost, and being so ambitious that one resorts to unethical methods.",
+    descriptionDa: "En vibration der handler om at nå toppen ved at blive mester i kommunikation. 55 er et mestertal (to af samme tal) hvilket betyder det tager tid at mestre tallet. I balance handler det om at have en enorm udstråling der giver succes med medier og forskellige kommunikationskanaler og opnå stor succes. Held i penge, venskaber, kærlighed. I ubalance handler det meget om at gå efter hvad man vil for enhver pris, og være så ambitiøs at man tyr til uetiske metoder.",
+    shortDescription: "Master communicator energy amplifies your presence. You'll feel extraordinarily articulate with powerful radiance. Words flow with impact and your message carries far.",
+    shortDescriptionDa: "Mesterkommunikatør-energi forstærker din tilstedeværelse. Du vil føle dig ekstraordinært veltalende med kraftfuld udstråling. Ord flyder med effekt og dit budskab bærer langt.",
+    actionTip: "Use your voice for good. Your message can reach millions—make sure it's ethical and authentic.",
+    actionTipDa: "Brug din stemme til noget godt. Dit budskab kan nå millioner—sørg for at det er etisk og autentisk.",
     category: 1
   },
   "64/1": {
     number: "64/1",
     caption: "The Wise Reformer",
+    captionDa: "Den Vise Reformator",
     description: "A vibration that deals with seeing what works and what doesn't work, and creating the necessary changes. In balance one is a wise man with great ideas that take into account the common good/love in the world. In imbalance one can appear a bit dry, overly critical/stubborn, know-it-all and like a 'know-it-all'.",
+    descriptionDa: "En vibration der handler om at se hvad der virker og hvad der ikke virker, og skabe de nødvendige forandringer. I balance er man en vismand med store idéer der tager hensyn til fælles bedste/kærlighed i verden. I ubalance kan man fremstå lidt tør, overkritisk/stædig, bedrevidende og som en 'besserwisser'.",
+    shortDescription: "Reformer's clarity sharpens your vision. You'll see what works and what doesn't with unusual precision. Wise insights about necessary changes arise naturally.",
+    shortDescriptionDa: "Reformatorens klarhed skærper din vision. Du vil se hvad der virker og hvad der ikke gør med usædvanlig præcision. Vise indsigter om nødvendige forandringer opstår naturligt.",
+    actionTip: "Balance critique with kindness. Your reforms land better when delivered with warmth.",
+    actionTipDa: "Balancer kritik med venlighed. Dine reformer lander bedre når de leveres med varme.",
     category: 1
   },
   "73/1": {
     number: "73/1",
     caption: "The Ingenious Pioneer",
+    captionDa: "Den Geniale Pioner",
     description: "A vibration that deals with creating brilliant and innovative things for the benefit of a better world, which can lead to great wealth without it being noticed. One has an enormous pioneer spirit and ability to lead and becomes wealthy. In balance one radiates beauty, strength and genius. Here it's not 'for money's sake'. In imbalance there can be a fatigue of being with other people and excessive need for privacy.",
+    descriptionDa: "En vibration der handler om at skabe geniale og innovative ting til gavn for en bedre verden, hvilket kan føre til stor rigdom uden at det bemærkes. Man har en enorm pionérånd og evne til at lede og bliver velhavende. I balance udstråler man skønhed, styrke og genialitet. Her er det ikke 'for pengenes skyld'. I ubalance kan der være træthed ved at være sammen med andre mennesker og overdrevet behov for privatliv.",
+    shortDescription: "Genius innovation flows through you. You'll feel brilliantly creative with pioneering spirit that could lead to unexpected wealth. A pull toward solitude may accompany this inventive energy.",
+    shortDescriptionDa: "Genial innovation flyder gennem dig. Du vil føle dig strålende kreativ med pionérånd der kan føre til uventet velstand. Et træk mod ensomhed kan ledsage denne opfindsomme energi.",
+    actionTip: "Create from inspiration, not obligation. Balance your need for solitude with meaningful connections.",
+    actionTipDa: "Skab fra inspiration, ikke forpligtelse. Balancer dit behov for ensomhed med meningsfulde forbindelser.",
     category: 1
   },
   "82/1": {
     number: "82/1",
     caption: "The Invincible Leader",
+    captionDa: "Den Uovervindelige Leder",
     description: "A vibration that gives an invincible and strong winner mentality, with many talents used to lift a community. In balance one is talented, expansive and a strong leader who lifts as a flock. In imbalance it gives anger, lack of consideration, and inner struggle without results, and can attract lawsuits. Very vulnerable",
+    descriptionDa: "En vibration der giver en uovervindelig og stærk vindermentalitet, med mange talenter brugt til at løfte et fællesskab. I balance er man talentfuld, ekspansiv og en stærk leder der løfter som en flok. I ubalance giver det vrede, mangel på hensyn, og indre kamp uden resultater, og kan tiltrække retssager. Meget sårbar.",
+    shortDescription: "Invincible, powerful energy surges through you. You'll feel an unshakeable winner mentality and drive to uplift your community. Many talents activate simultaneously.",
+    shortDescriptionDa: "Uovervindelig, kraftfuld energi strømmer gennem dig. Du vil føle en urokkelig vindermentalitet og drivkraft til at løfte dit fællesskab. Mange talenter aktiveres samtidigt.",
+    actionTip: "Lead with your heart, not your ego. Your vulnerability is actually your greatest strength.",
+    actionTipDa: "Led med dit hjerte, ikke dit ego. Din sårbarhed er faktisk din største styrke.",
     category: 1
   },
   "91/1": {
     number: "91/1",
     caption: "The World Conqueror",
+    captionDa: "Verdenseroberen",
     description: "A magnificent and expansive vibration that wants to conquer the world with its new ideas. In balance it gives enormous success and has great inspiration and speaking gifts. Focused, strong, luck in money and business. In imbalance there can be strong egoism, narcissistic tendencies, tendency to megalomania where one feels small inside but projects an exaggerated belief in one's own abilities. Inflexible",
+    descriptionDa: "En storslået og ekspansiv vibration der vil erobre verden med sine nye idéer. I balance giver det enorm succes og har stor inspiration og talegaver. Fokuseret, stærk, held i penge og forretning. I ubalance kan der være stærk egoisme, narcissistiske tendenser, tendens til storhedsvanvid hvor man føler sig lille indeni men projicerer en overdreven tro på egne evner. Ufleksibel.",
+    shortDescription: "World-conquering ambition ignites within. You'll feel magnificently expansive with bold ideas demanding expression. Success magnetism and speaking gifts amplify powerfully.",
+    shortDescriptionDa: "Verdenserobrende ambition tændes indeni. Du vil føle dig storslået ekspansiv med modige idéer der kræver udtryk. Succesmagnetisme og talegaver forstærkes kraftigt.",
+    actionTip: "Stay humble in victory. True world-changers lift others as they rise.",
+    actionTipDa: "Forbliv ydmyg i sejr. Sande verdens-forandrere løfter andre mens de stiger.",
     category: 1
   },
   // 2 numbers
   "11/2": {
     number: "11/2",
     caption: "The Gentle Soul",
+    captionDa: "Den Blide Sjæl",
     description: "An overly gentle, soft and naive vibration that is too good-natured and has difficulty saying no. It deals with inner division, and is conflict-averse, a 'people pleaser' and creates a need to numb one's emotions e.g. through overeating or other dependencies. Others' betrayal, hidden dangers, tears",
+    descriptionDa: "En overfølsom, blid og naiv vibration der er for godtroende og har svært ved at sige nej. Den handler om indre splittelse, og er konfliktsky, en 'people pleaser' og skaber et behov for at bedøve sine følelser f.eks. gennem overspisning eller andre afhængigheder. Andres forræderi, skjulte farer, tårer.",
+    shortDescription: "Extreme gentleness and sensitivity wash over you. You'll feel tender, soft-hearted, and perhaps too easily affected by others. Boundaries may blur as you absorb surrounding emotions.",
+    shortDescriptionDa: "Ekstrem blødhed og sensitivitet skyller over dig. Du vil føle dig øm, blødhjertet og måske for let påvirket af andre. Grænser kan blive uklare når du absorberer omgivende følelser.",
+    actionTip: "Learn to say no with love. Your kindness is a gift—protect it with healthy boundaries.",
+    actionTipDa: "Lær at sige nej med kærlighed. Din venlighed er en gave—beskyt den med sunde grænser.",
     category: 2
   },
   "20/2": {
     number: "20/2",
     caption: "The Guided Angel",
+    captionDa: "Den Guidede Engel",
     description: "A harmonious, sensitive and gentle vibration that attracts gentle, positive angel energies around oneself/an angel that guides through life. In balance things come incredibly easily to one, and one is placed on the right shelf, and gets to do what one loves; to follow one's passion. Pure line to the first floor. In imbalance one can be flighty, stressed and have great changeability. Can be a bit uncertain about where 'one should stand.'",
+    descriptionDa: "En harmonisk, sensitiv og blid vibration der tiltrækker blide, positive engle-energier omkring sig/en engel der guider gennem livet. I balance kommer tingene utroligt let til én, og man bliver placeret på den rigtige hylde, og får lov til at gøre det man elsker; at følge sin passion. Ren linje til første sal. I ubalance kan man være flagrende, stresset og have stor foranderlighed. Kan være lidt usikker på hvor 'man skal stå'.",
+    shortDescription: "Angelic, harmonious energy surrounds you. Things flow with remarkable ease as if guided by unseen forces. You'll feel drawn toward your passion with unusual clarity about your path.",
+    shortDescriptionDa: "Englelig, harmonisk energi omgiver dig. Ting flyder med bemærkelsesværdig lethed som om guidet af usynlige kræfter. Du vil føle dig draget mod din passion med usædvanlig klarhed om din vej.",
+    actionTip: "Listen to your intuition—it's your angel speaking. Follow what lights you up.",
+    actionTipDa: "Lyt til din intuition—det er din engel der taler. Følg det der tænder dig.",
     category: 2
   },
   "29/2": {
     number: "29/2",
     caption: "The Betrayed Innocent",
+    captionDa: "Den Forrådte Uskyldige",
     description: "A vibration that gives tendency for others to overstep one's boundaries and for one to be deceived, cheated, badly treated and exploited. Great tendency to be naive and close one's eyes to the realities of reality. This brings sorrow and disappointment and misfortune, so one loses. Dangers",
+    descriptionDa: "En vibration der giver tendens til at andre overskrider ens grænser og til at man bliver bedraget, snydt, dårligt behandlet og udnyttet. Stor tendens til at være naiv og lukke øjnene for virkelighedens realiteter. Dette bringer sorg og skuffelse og uheld, så man taber. Farer.",
+    shortDescription: "Vulnerable, innocent energy makes you more susceptible to disappointment. You may feel naively trusting while others overstep boundaries. Hidden dangers and potential betrayals lurk.",
+    shortDescriptionDa: "Sårbar, uskyldig energi gør dig mere modtagelig for skuffelse. Du kan føle dig naivt tillidsfuld mens andre overskrider grænser. Skjulte farer og potentielle forræderier lurer.",
+    actionTip: "Trust, but verify. Your open heart is beautiful—pair it with discerning eyes.",
+    actionTipDa: "Stol på, men verificer. Dit åbne hjerte er smukt—par det med skarpsynede øjne.",
     category: 2
   },
   "38/2": {
     number: "38/2",
     caption: "The Unvalued Heart",
+    captionDa: "Det Uværdsatte Hjerte",
     description: "It is predominantly imbalanced in the numeroscope, and one typically feels unappreciated, unheard and unseen. An inner division and disharmony characterizes the mind. One is filled with sorrow and disappointment, and can be really unlucky.",
+    descriptionDa: "Det er overvejende i ubalance i numeroskopet, og man føler sig typisk uværdsat, uhørt og uset. En indre splittelse og disharmoni karakteriserer sindet. Man er fyldt med sorg og skuffelse, og kan være rigtig uheldig.",
+    shortDescription: "You may feel unappreciated, unheard, or unseen during this period. Inner disharmony and a sense of being undervalued can dominate. Sorrow and disappointment may surface.",
+    shortDescriptionDa: "Du kan føle dig uværdsat, uhørt eller uset i denne periode. Indre disharmoni og en følelse af at blive undervurderet kan dominere. Sorg og skuffelse kan dukke op.",
+    actionTip: "Speak up for what you need. Your voice matters—let it be heard.",
+    actionTipDa: "Sig fra om hvad du har brug for. Din stemme betyder noget—lad den blive hørt.",
     category: 2
   },
   "47/2": {
     number: "47/2",
     caption: "The Dreaming Recluse",
+    captionDa: "Den Drømmende Eneboer",
     description: "A vibration that deals with dreams, hope and great sensitivity. However, one often becomes disappointed and is quite unlucky. There is a tendency to be otherworldly, and one might prefer books or computers over people.",
+    descriptionDa: "En vibration der handler om drømme, håb og stor sensitivitet. Dog bliver man ofte skuffet og er ret uheldig. Der er en tendens til at være verdensfjern, og man foretrækker måske bøger eller computere frem for mennesker.",
+    shortDescription: "Dreamy, otherworldly energy pulls you inward. You'll feel highly sensitive and drawn to imagination over reality. A preference for solitude and inner worlds intensifies.",
+    shortDescriptionDa: "Drømmende, verdenfjern energi trækker dig indad. Du vil føle dig meget sensitiv og draget mod fantasi frem for virkelighed. En præference for ensomhed og indre verdener intensiveres.",
+    actionTip: "Step out of your comfort zone. Connection with others can bring your dreams to life.",
+    actionTipDa: "Træd ud af din komfortzone. Forbindelse med andre kan bringe dine drømme til live.",
     category: 2
   },
   "56/2": {
     number: "56/2",
     caption: "The Insecure Manipulator",
+    captionDa: "Den Usikre Manipulator",
     description: "A vibration that deals with personal charisma and has a playful energy that easily and elegantly convinces others. It manipulates through drama, can be verbally aggressive and dominating due to a great inner insecurity. Here one is also unlucky, disappointed, hurt due to other people's actions",
+    descriptionDa: "En vibration der handler om personlig karisma og har en legende energi der nemt og elegant overbeviser andre. Den manipulerer gennem drama, kan være verbalt aggressiv og dominerende på grund af en stor indre usikkerhed. Her er man også uheldig, skuffet, såret på grund af andre menneskers handlinger.",
+    shortDescription: "Charismatic but unstable energy swirls. You'll feel playfully persuasive yet driven by inner insecurity. Drama and emotional intensity may surface as you seek validation.",
+    shortDescriptionDa: "Karismatisk men ustabil energi hvirvler. Du vil føle dig legende overbevisende men drevet af indre usikkerhed. Drama og emotionel intensitet kan dukke op mens du søger bekræftelse.",
+    actionTip: "Express your needs directly. Honest communication is more powerful than manipulation.",
+    actionTipDa: "Udtryk dine behov direkte. Ærlig kommunikation er mere kraftfuld end manipulation.",
     category: 2
   },
   "65/2": {
     number: "65/2",
     caption: "The Protective Controller",
+    captionDa: "Den Beskyttende Kontrollør",
     description: "A vibration that deals very much with protecting others. There can be a tendency to give others advice in order to dominate or to feel loved, and can be verbally aggressive. Disappointed and hurt by other people. Misfortune",
+    descriptionDa: "En vibration der handler meget om at beskytte andre. Der kan være en tendens til at give andre råd for at dominere eller føle sig elsket, og kan være verbalt aggressiv. Skuffet og såret af andre mennesker. Uheld.",
+    shortDescription: "Strong protective urges arise, sometimes veering into control. You'll feel compelled to guide others, though disappointment and hurt from relationships may color this period.",
+    shortDescriptionDa: "Stærke beskyttende trang opstår, som nogle gange glider over i kontrol. Du vil føle dig tvunget til at guide andre, selvom skuffelse og smerte fra relationer kan farve denne periode.",
+    actionTip: "Offer guidance without attachment. True care means trusting others to find their way.",
+    actionTipDa: "Tilbyd vejledning uden tilknytning. Sand omsorg betyder at stole på at andre finder deres vej.",
     category: 2
   },
   "74/2": {
     number: "74/2",
     caption: "The Emotionally Elusive",
+    captionDa: "Den Følelsesmæssigt Undvigende",
     description: "One can keep their emotions secret, drown in their emotions, 'tune out' (nobody's home) or numb their emotions with e.g. sugar or dependencies. In balance there is a philosophical, strategic and artistic side united in one and the same person. Flighty and confused, unlucky, disappointed and sad",
+    descriptionDa: "Man kan holde sine følelser hemmelige, drukne i sine følelser, 'tune ud' (ingen hjemme) eller bedøve sine følelser med f.eks. sukker eller afhængigheder. I balance er der en filosofisk, strategisk og kunstnerisk side forenet i én og samme person. Flagrende og forvirret, uheldig, skuffet og trist.",
+    shortDescription: "Emotional elusiveness characterizes this period. You may feel detached, secretive about feelings, or tempted to numb emotions. Confusion and sadness may linger beneath the surface.",
+    shortDescriptionDa: "Følelsesmæssig undvigelighed karakteriserer denne periode. Du kan føle dig distanceret, hemmelighedsfuld om følelser, eller fristet til at bedøve følelser. Forvirring og tristhed kan lure under overfladen.",
+    actionTip: "Stay present with your feelings. What you feel is valid—don't escape, explore.",
+    actionTipDa: "Forbliv nærværende med dine følelser. Hvad du føler er gyldigt—flygt ikke, udforsk.",
     category: 2
   },
   "83/2": {
     number: "83/2",
     caption: "The Fearful Controller",
+    captionDa: "Den Bange Kontrollør",
     description: "Fear and tendency to over-control. So one can become a bit preachy, and think one is a bit above others, so one gets an aura that causes one to attract disappointments, sorrows, misfortune; one is a bit sensitive and feels unfairly treated",
+    descriptionDa: "Frygt og tendens til overkontrol. Så man kan blive lidt prædikende, og tro man er lidt over andre, så man får en aura der gør at man tiltrækker skuffelser, sorger, uheld; man er lidt sensitiv og føler sig uretfærdigt behandlet.",
+    shortDescription: "Fear-driven control energy takes hold. You may feel anxious, preachy, or superior while attracting disappointments. Sensitivity to unfair treatment heightens.",
+    shortDescriptionDa: "Frygtdrevet kontrolenergi tager fat. Du kan føle dig ængstelig, prædikende eller overlegen mens du tiltrækker skuffelser. Sensitivitet over for uretfærdig behandling intensiveres.",
+    actionTip: "Practice letting go. Not everything needs your oversight—trust the process.",
+    actionTipDa: "Øv dig i at slippe. Ikke alt behøver dit tilsyn—stol på processen.",
     category: 2
   },
   "92/2": {
     number: "92/2",
     caption: "The Naive Romantic",
+    captionDa: "Den Naive Romantiker",
     description: "A vibration that deals with a tendency to naivety, to become unhappily in love, or be unrealistic about one's relationships and be exploited by others. Others don't really know where they have one = sorrows, misfortune, disappointments, losing",
+    descriptionDa: "En vibration der handler om en tendens til naivitet, at blive ulykkelig forelsket, eller være urealistisk om sine relationer og blive udnyttet af andre. Andre ved ikke rigtig hvor de har én = sorger, uheld, skuffelser, at tabe.",
+    shortDescription: "Naive romantic energy makes you vulnerable to unrealistic expectations in love. You may feel exploited or misunderstood, with sorrow and disappointment arising from relationships.",
+    shortDescriptionDa: "Naiv romantisk energi gør dig sårbar over for urealistiske forventninger i kærlighed. Du kan føle dig udnyttet eller misforstået, med sorg og skuffelse der opstår fra relationer.",
+    actionTip: "Be clear about who you are. Consistency builds trust in relationships.",
+    actionTipDa: "Vær klar på hvem du er. Konsistens bygger tillid i relationer.",
     category: 2
   },
   // 3 numbers
   "12/3": {
     number: "12/3",
-    caption: "The Victim Number",
+    caption: "The Sacrifice Number",
+    captionDa: "Offertallet",
     description: "A vibration that deals with being misunderstood, over-interpreting, turning and twisting things in one's head and having a distorted view of reality. There is a chaotic mind with stress and mental clutter, where one tries their way through life with 'quick fixes' that go wrong. Tendency to be clumsy in speech or action. Victim of others' pressure that must be numbed. One trips oneself up (victim)",
+    descriptionDa: "En vibration der handler om at blive misforstået, over-tolke, vende og dreje ting i sit hoved og have et forvrænget syn på virkeligheden. Der er et kaotisk sind med stress og mentalt rod, hvor man prøver sig frem gennem livet med 'hurtige løsninger' der går galt. Tendens til at være klodset i tale eller handling. Offer for andres pres der skal bedøves. Man snubler over sig selv (offer).",
+    shortDescription: "Mental intensity runs high—expect racing thoughts, overthinking, and a busy mind seeking answers. You may feel misunderstood or overwhelmed by mental clutter as clarity seems just out of reach.",
+    shortDescriptionDa: "Mental intensitet kører på højtryk—forvent jagende tanker, overtænkning og et travlt sind der søger svar. Du kan føle dig misforstået eller overvældet af mentalt rod mens klarhed synes lige uden for rækkevidde.",
+    actionTip: "Slow down your racing mind. Clarity comes when you stop overthinking and trust your first instinct.",
+    actionTipDa: "Sænk farten på dit jagende sind. Klarhed kommer når du stopper med at overtænke og stoler på din første indskydelse.",
     category: 3
   },
   "21/3": {
     number: "21/3",
     caption: "The Magician's Crown (Crown of Magic)",
+    captionDa: "Magikerens Krone (Magiens Krone)",
     description: "A vibration that deals with resting in the process towards success, having high ambitions, and taking things one step at a time towards the completion of one's goals. One cracks their personal key to success, and understands the importance of thorough preparation. Progress and success in life. A bit strong for a baby",
+    descriptionDa: "En vibration der handler om at hvile i processen mod succes, have høje ambitioner, og tage tingene ét skridt ad gangen mod fuldendelsen af sine mål. Man knækker sin personlige nøgle til succes, og forstår vigtigheden af grundig forberedelse. Fremgang og succes i livet. Lidt stærk for en baby.",
+    shortDescription: "Magical, methodical energy guides you toward success. You'll feel ambitious yet patient, understanding that each step builds toward your crown achievement. High aspirations feel attainable.",
+    shortDescriptionDa: "Magisk, metodisk energi guider dig mod succes. Du vil føle dig ambitiøs men tålmodig, forstående at hvert skridt bygger mod din kroningspræstation. Høje aspirationer føles opnåelige.",
+    actionTip: "Prepare thoroughly. Your success is built on solid foundations, not shortcuts.",
+    actionTipDa: "Forbered dig grundigt. Din succes er bygget på solide fundamenter, ikke genveje.",
     category: 3
   },
   "30/3": {
     number: "30/3",
     caption: "The Powerful Competitor",
+    captionDa: "Den Kraftfulde Konkurrent",
     description: "A vibration that gives lots of energy and strength, drive and ambition, as well as a strong strategic sense and personal power. There is a strong intellectual power, and one expresses oneself sincerely and honestly. It takes energy from what lies around and can therefore become best or worst. In imbalance there is tendency to know-it-all attitude, arrogance, competition and comparing oneself with others. There is tendency to put on masks.",
+    descriptionDa: "En vibration der giver masser af energi og styrke, drivkraft og ambition, samt en stærk strategisk sans og personlig magt. Der er en stærk intellektuel kraft, og man udtrykker sig ærligt og oprigtigt. Den tager energi fra det der ligger omkring og kan derfor blive bedst eller værst. I ubalance er der tendens til bedrevidende holdning, arrogance, konkurrence og at sammenligne sig med andre. Der er tendens til at tage masker på.",
+    shortDescription: "Powerful, competitive energy surges through you. You'll feel intellectually sharp, strategically focused, and driven to excel. Personal power amplifies but may tip toward arrogance.",
+    shortDescriptionDa: "Kraftfuld, konkurrencepræget energi strømmer gennem dig. Du vil føle dig intellektuelt skarp, strategisk fokuseret og drevet til at excellere. Personlig magt forstærkes men kan tippe mod arrogance.",
+    actionTip: "Compete with yourself, not others. Your greatest rival is yesterday's version of you.",
+    actionTipDa: "Konkurrer med dig selv, ikke andre. Din største rival er gårsdagens udgave af dig.",
     category: 3
   },
   "39/3": {
     number: "39/3",
     caption: "The Controlling Boss",
+    captionDa: "Den Kontrollerende Chef",
     description: "Imbalanced in the numeroscope. There is a tendency to tell others what they should and shouldn't do, and can easily overstep others' boundaries. One has difficulty relaxing in the leadership role. Outwardly one is 'bossy', but inwardly one can feel like a victim with lots of mental clutter and self-doubt. Too much control and superiority",
+    descriptionDa: "Ubalanceret i numeroskopet. Der er en tendens til at fortælle andre hvad de skal og ikke skal gøre, og kan nemt overskride andres grænser. Man har svært ved at slappe af i lederrollen. Udadtil er man 'bossy', men indadtil kan man føle sig som et offer med masser af mentalt rod og selvtvivl. For meget kontrol og overlegenhed.",
+    shortDescription: "Controlling, bossy energy emerges. Outwardly you'll feel driven to direct others, while inwardly mental clutter and self-doubt may brew. The urge to overstep boundaries intensifies.",
+    shortDescriptionDa: "Kontrollerende, dominerende energi dukker op. Udadtil vil du føle dig drevet til at styre andre, mens indadtil mentalt rod og selvtvivl kan brygge. Trangen til at overskride grænser intensiveres.",
+    actionTip: "Ask questions instead of giving orders. Empower others to find their own solutions.",
+    actionTipDa: "Stil spørgsmål i stedet for at give ordrer. Styrk andre til at finde deres egne løsninger.",
     category: 3
   },
   "48/3": {
     number: "48/3",
     caption: "The Analytical Perfectionist",
+    captionDa: "Den Analytiske Perfektionist",
     description: "A vibration that deals with delving deeply into things and turning and twisting the smallest detail. Best at intellectual, complex and intricate work, research as well as political strategy. A tendency for the inner and outer forces to be pulled apart, and one can feel enormously split inside about the things one sets in motion. Imbalanced due to the inner 4-8 tension and it requires great awareness to bring it out positively.",
+    descriptionDa: "En vibration der handler om at dykke dybt ned i ting og vende og dreje den mindste detalje. Bedst til intellektuelt, komplekst og indviklet arbejde, forskning samt politisk strategi. En tendens til at de indre og ydre kræfter trækkes fra hinanden, og man kan føle sig enormt splittet indeni om de ting man sætter i gang. Ubalanceret på grund af den indre 4-8 spænding og det kræver stor bevidsthed at bringe det ud positivt.",
+    shortDescription: "Analytical, perfectionist energy intensifies. You'll feel drawn to examine every detail, potentially becoming split between inner and outer demands. Inner tension may cause analysis paralysis.",
+    shortDescriptionDa: "Analytisk, perfektionistisk energi intensiveres. Du vil føle dig draget til at undersøge hver detalje, potentielt blive splittet mellem indre og ydre krav. Indre spænding kan forårsage analyselammelse.",
+    actionTip: "Done is better than perfect. Ship your work and iterate—perfection is the enemy of progress.",
+    actionTipDa: "Færdig er bedre end perfekt. Send dit arbejde ud og iterer—perfektion er fremgangenes fjende.",
     category: 3
   },
   "57/3": {
     number: "57/3",
     caption: "The Restless Explorer",
+    captionDa: "Den Rastløse Opdagelsesrejsende",
     description: "A vibration that gives a great need to explore new places, ideas and deals with longing for foreign lands. A polar explorer or adventurer vibration. One can be insensitive and jog in the spinach or step on others' toes with their big arm movements. Great desire for new experiences. Profound conclusions",
+    descriptionDa: "En vibration der giver et stort behov for at udforske nye steder, idéer og handler om længsel efter fremmede lande. En polarforsker eller eventyrer vibration. Man kan være ufølsom og trampe i spinaten eller træde andre over tæerne med sine store armbevægelser. Stor lyst til nye oplevelser. Dybe konklusioner.",
+    shortDescription: "Restless explorer energy awakens a deep longing for new places and ideas. You'll feel adventurous and drawn to foreign horizons, though you may accidentally step on toes in your excitement.",
+    shortDescriptionDa: "Rastløs opdagelsesrejsende-energi vækker en dyb længsel efter nye steder og idéer. Du vil føle dig eventyrlystent og draget mod fremmede horisonter, selvom du ved et uheld kan træde andre over tæerne i din begejstring.",
+    actionTip: "Plan your next adventure. New experiences expand your wisdom and perspective.",
+    actionTipDa: "Planlæg dit næste eventyr. Nye oplevelser udvider din visdom og perspektiv.",
     category: 3
   },
   "66/3": {
     number: "66/3",
     caption: "The Earth Mother",
+    captionDa: "Jordmoderen",
     description: "A vibration that deals with great feminine power in the more earthly, motherly way, where one organizes, takes care of and acts in the world on the physical plane. There can be a bit of roughness, hardness, controlling, stubbornness and dominance.",
+    descriptionDa: "En vibration der handler om stor feminin kraft på den mere jordnære, moderlige måde, hvor man organiserer, tager sig af og handler i verden på det fysiske plan. Der kan være lidt barskhed, hårdhed, kontrol, stædighed og dominans.",
+    shortDescription: "Powerful earth-mother energy grounds you in practical nurturing. You'll feel driven to organize, protect, and care for others on the physical plane—though roughness or stubbornness may surface.",
+    shortDescriptionDa: "Kraftfuld jordmoder-energi jordforbinder dig i praktisk omsorg. Du vil føle dig drevet til at organisere, beskytte og tage dig af andre på det fysiske plan—selvom barskhed eller stædighed kan dukke op.",
+    actionTip: "Balance strength with softness. Your protective instincts serve best when tempered with patience.",
+    actionTipDa: "Balancer styrke med blødhed. Dine beskyttende instinkter tjener bedst når de hærdes med tålmodighed.",
     category: 3
   },
   "75/3": {
@@ -337,13 +616,25 @@ const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation
   "13/4": {
     number: "13/4",
     caption: "The Mystical Transformer",
+    captionDa: "Den Mystiske Forvandler",
     description: "The number 13 is one of the most deep and mystical numbers, which stands for both death, transformational power and a unique beauty. One removes the old to make room for the new, and it can both frighten and inspire others. One therefore cannot help but do things in their own completely unique way. If it stands with bad numbers in the numeroscope, it gives an inner dissatisfaction, where one always longs for something other than what one has, and one feels like the black sheep. Unique, thinks differently and outside the box, and always has new ideas that can transform the surroundings. A number that strengthens art, innovation and genius. Can also give money",
+    descriptionDa: "Tallet 13 er et af de mest dybe og mystiske tal, som står for både død, transformationskraft og en unik skønhed. Man fjerner det gamle for at gøre plads til det nye, og det kan både skræmme og inspirere andre. Man kan derfor ikke lade være med at gøre tingene på sin helt unikke måde. Hvis det står med dårlige tal i numeroskopet, giver det en indre utilfredshed, hvor man altid længes efter noget andet end det man har, og man føler sig som det sorte får. Unik, tænker anderledes og uden for boksen, og har altid nye idéer der kan transformere omgivelserne. Et tal der styrker kunst, innovation og genialitet. Kan også give penge.",
+    shortDescription: "Transformation is your superpower. Release the old to welcome profound new beginnings with unique beauty.",
+    shortDescriptionDa: "Transformation er din superkraft. Slip det gamle for at byde dybe nye begyndelser velkommen med unik skønhed.",
+    actionTip: "Embrace your uniqueness. What makes you different is what makes you powerful.",
+    actionTipDa: "Omfavn din unikhed. Det der gør dig anderledes er det der gør dig kraftfuld.",
     category: 4
   },
   "22/4": {
     number: "22/4",
     caption: "The Fool",
+    captionDa: "Narren",
     description: "The tarot card for the number 22/4 is 'The Fool' or the jester. We see a man stepping out over the cliff edge. The number stands for naivety and delusion for better and worse. It stands for new ways of doing things and that one is always ready to jump into nothingness. One puts on 'rose-colored glasses', is far too naive and gets deceived by others. Annoyances, disappointments, too good-natured",
+    descriptionDa: "Tarotkortet for tallet 22/4 er 'Narren' eller gøgleren. Vi ser en mand der træder ud over klippekanten. Tallet står for naivitet og vildfarelse på godt og ondt. Det står for nye måder at gøre tingene på og at man altid er klar til at springe ud i intetheden. Man tager 'rosenrøde briller' på, er alt for naiv og bliver bedraget af andre. Irritationer, skuffelser, for godtroende.",
+    shortDescription: "Take a leap of faith, but look before you jump. Your innocent heart needs the protection of wise discernment.",
+    shortDescriptionDa: "Tag et spring ud i det ukendte, men kig før du springer. Dit uskyldige hjerte har brug for beskyttelse fra klog dømmekraft.",
+    actionTip: "Balance optimism with realism. Trust, but keep your eyes open.",
+    actionTipDa: "Balancer optimisme med realisme. Stol på, men hold øjnene åbne.",
     category: 4
   },
   "31/4": {
@@ -398,13 +689,25 @@ const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation
   "14/5": {
     number: "14/5",
     caption: "The Master Communicator",
+    captionDa: "Mesterkommunikatoren",
     description: "A vibration that represents perfect mastery of the senses, right timing and mastering the art of communication and situational awareness. When balanced, one is skilled at networking, business and has luck with money, deals, and has great activity and action power on all levels of life. There can be stress, an overactive mind and one talks so much that it irritates others, if one has too many in the numeroscope. Luck with money and deals",
+    descriptionDa: "En vibration der repræsenterer perfekt beherskelse af sanserne, rigtig timing og beherskelse af kommunikationskunsten og situationsbevidsthed. Når man er i balance, er man dygtig til netværk, forretning og har held med penge, aftaler, og har stor aktivitet og handlekraft på alle livets niveauer. Der kan være stress, et overaktivt sind og man taler så meget at det irriterer andre, hvis man har for mange i numeroskopet. Held med penge og aftaler.",
+    shortDescription: "Communication flows effortlessly from you. Your timing is impeccable—use your networking gifts wisely.",
+    shortDescriptionDa: "Kommunikation flyder ubesværet fra dig. Din timing er upåklagelig—brug dine netværksevner klogt.",
+    actionTip: "Network strategically. Your words open doors—make every conversation count.",
+    actionTipDa: "Netværk strategisk. Dine ord åbner døre—gør hver samtale betydningsfuld.",
     category: 5
   },
   "23/5": {
     number: "23/5",
     caption: "The Lion's Royal Star",
+    captionDa: "Løvens Kongelige Stjerne",
     description: "The number called the highest vibration, gives great protection in life in everything we do. It gives great flow and luck in life, where things come to one with incredible ease. It adds healing, love and self-confidence as well as enormous charisma and protection. In addition, great speech gifts and a feeling of abundance in life. One of the greatest money numbers in numerology. Success, joy, love, self-confidence.",
+    descriptionDa: "Tallet kaldes den højeste vibration, giver stor beskyttelse i livet i alt hvad vi gør. Det giver stort flow og held i livet, hvor tingene kommer til én med utrolig lethed. Det tilføjer healing, kærlighed og selvtillid samt enorm karisma og beskyttelse. Derudover store talegaver og en følelse af overflod i livet. Et af de største pengetal i numerologi. Succes, glæde, kærlighed, selvtillid.",
+    shortDescription: "Royal energy protects and blesses you. Everything flows with ease—embrace this abundant, charismatic time.",
+    shortDescriptionDa: "Kongelig energi beskytter og velsigner dig. Alt flyder med lethed—omfavn denne overflods- og karismatiske tid.",
+    actionTip: "Share your abundance. When you're blessed, bless others—the flow multiplies.",
+    actionTipDa: "Del din overflod. Når du er velsignet, velsign andre—flowet multipliceres.",
     category: 5
   },
   "32/5": {
@@ -459,13 +762,25 @@ const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation
   "15/6": {
     number: "15/6",
     caption: "The Magical Temptress",
+    captionDa: "Den Magiske Fristersske",
     description: "A strong, feminine vibration that contains great erotic and magical power, pleasure and sensuality, aesthetic sense and artistic abilities. The number 'shines into the darkness' and heals others. When appearing more than once in a numeroscope, there is a tendency to be manipulative, moody, jealous and deceitful. The ego and unprocessed emotions rule. The number is the most occult number, which gives the ability to travel between worlds and consciousness planes or mental illness/instability.",
+    descriptionDa: "En stærk, feminin vibration der indeholder stor erotisk og magisk kraft, nydelse og sensualitet, æstetisk sans og kunstneriske evner. Tallet 'lyser ind i mørket' og healer andre. Når det optræder mere end én gang i et numeroskop, er der en tendens til at være manipulerende, lunefuld, jaloux og bedragerisk. Egoet og uforarbejdede følelser styrer. Tallet er det mest okkulte tal, som giver evnen til at rejse mellem verdener og bevidsthedsniveauer eller mental sygdom/ustabilitet.",
+    shortDescription: "Magnetic power flows through you. Channel your sensuality and creativity into healing light, not shadow play.",
+    shortDescriptionDa: "Magnetisk kraft flyder gennem dig. Kanaliser din sensualitet og kreativitet ind i helbredende lys, ikke skyggeleg.",
+    actionTip: "Use your allure consciously. Your magic transforms when aligned with integrity.",
+    actionTipDa: "Brug din tiltrækning bevidst. Din magi transformerer når den er på linje med integritet.",
     category: 6
   },
   "24/6": {
     number: "24/6",
     caption: "The Venus Power",
+    captionDa: "Venuskraften",
     description: "The vibration stands for strength united with wisdom, harmony, creativity and gentleness. It is a Venus vibration that deals with love and harmonious family life, personal magnetism and attractiveness. One is full of love, trust, femininity and has luck in business. One attracts help from people in 'higher positions' and one has great luck in love",
+    descriptionDa: "Vibrationen står for styrke forenet med visdom, harmoni, kreativitet og blødhed. Det er en Venus-vibration der handler om kærlighed og harmonisk familieliv, personlig magnetisme og tiltrækningskraft. Man er fuld af kærlighed, tillid, femininitet og har held i forretning. Man tiltrækker hjælp fra mennesker i 'højere positioner' og man har stort held i kærlighed.",
+    shortDescription: "Venus blesses you with love, beauty and harmony. Your magnetism attracts wonderful people and opportunities.",
+    shortDescriptionDa: "Venus velsigner dig med kærlighed, skønhed og harmoni. Din magnetisme tiltrækker vidunderlige mennesker og muligheder.",
+    actionTip: "Nurture your relationships. Love given freely returns multiplied.",
+    actionTipDa: "Plej dine relationer. Kærlighed givet frit vender tilbage mangedoblet.",
     category: 6
   },
   "33/6": {
@@ -520,7 +835,13 @@ const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation
   "16/7": {
     number: "16/7",
     caption: "The Fallen Tower",
+    captionDa: "Det Faldne Tårn",
     description: "A vibration traditionally called 'the loss number' and deals with being struck by loss like lightning from a clear sky. The number as an essence number deals with one of the deepest life lessons; that nothing lasts forever. And it is a reminder not to hold onto anything of the physical world. The number is never used in the numeroscope, as it can attract a feeling of isolation, loneliness, struggling, loss, anxiety and fear. Life-threatening fate, wounds on the soul, jealousy, violence, destruction of one's plans.",
+    descriptionDa: "En vibration der traditionelt kaldes 'tabstallet' og handler om at blive ramt af tab som lyn fra en klar himmel. Tallet som essenstal handler om en af de dybeste livslektioner; at intet varer evigt. Og det er en påmindelse om ikke at holde fast i noget af den fysiske verden. Tallet bruges aldrig i numeroskopet, da det kan tiltrække en følelse af isolation, ensomhed, kamp, tab, angst og frygt. Livstruende skæbne, sår på sjælen, jalousi, vold, ødelæggelse af ens planer.",
+    shortDescription: "A tower falls to make way for something new. Release attachments and trust that loss opens doors to rebirth.",
+    shortDescriptionDa: "Et tårn falder for at gøre plads til noget nyt. Slip tilknytninger og stol på at tab åbner døre til genfødsel.",
+    actionTip: "Let go of what's crumbling. Your hands need to be empty to receive what's coming.",
+    actionTipDa: "Slip hvad der smuldrer. Dine hænder skal være tomme for at modtage hvad der kommer.",
     category: 7
   },
   "25/7": {
@@ -581,7 +902,13 @@ const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation
   "17/8": {
     number: "17/8",
     caption: "The Star of Magic",
+    captionDa: "Magiens Stjerne",
     description: "A vibration that deals with peace, love, the universe and art. It adds a 'celebrity' vibe and unique charm that attracts positive attention and star status; one's name is remembered and one can become famous. In balance it is a number that adds archetypal beauty, and an ability to channel divine art or wisdom, great learning ability and high intellect. In imbalance one attracts negative spotlight, can become unpopular for the slightest 'mistake' or receive great public criticism. It is therefore a vibration that is only good in a 100% pure numeroscope.",
+    descriptionDa: "En vibration der handler om fred, kærlighed, universet og kunst. Den tilføjer en 'kendis' vibe og unik charme der tiltrækker positiv opmærksomhed og stjernestatus; ens navn huskes og man kan blive berømt. I balance er det et tal der tilføjer arketypisk skønhed, og en evne til at kanalisere guddommelig kunst eller visdom, stor læringsevne og høj intelligens. I ubalance tiltrækker man negativt spotlight, kan blive upopulær for den mindste 'fejl' eller modtage stor offentlig kritik. Det er derfor en vibration der kun er god i et 100% rent numeroskop.",
+    shortDescription: "Star quality shines through you. Your unique charm attracts recognition—channel it into art and wisdom.",
+    shortDescriptionDa: "Stjernekvalitet skinner gennem dig. Din unikke charme tiltrækker anerkendelse—kanaliser det ind i kunst og visdom.",
+    actionTip: "Create with intention. Your spotlight illuminates whatever you focus on—choose wisely.",
+    actionTipDa: "Skab med intention. Dit spotlight oplyser hvad end du fokuserer på—vælg klogt.",
     category: 8
   },
   "26/8": {
@@ -642,19 +969,37 @@ const compoundNumberInterpretations: Record<string, CompoundNumberInterpretation
   "18/9": {
     number: "18/9",
     caption: "The Principled Warrior",
+    captionDa: "Den Principfaste Kriger",
     description: "This vibration deals with postponing needs to achieve goals one has set for oneself, and thereby gaining even greater joy. One is a warrior with principles, and has a strong understanding of hierarchy, and the ability to sacrifice oneself for the service of a higher cause. It is not used in the numeroscope as it can represent too hard an energy that shuts down emotions.",
+    descriptionDa: "Denne vibration handler om at udsætte behov for at opnå mål man har sat for sig selv, og derved opnå endnu større glæde. Man er en kriger med principper, og har en stærk forståelse af hierarki, og evnen til at ofre sig selv i tjeneste for en højere sag. Det bruges ikke i numeroskopet da det kan repræsentere for hård en energi der lukker ned for følelser.",
+    shortDescription: "Discipline serves your highest purpose. Your principles guide you to meaningful victories worth the sacrifice.",
+    shortDescriptionDa: "Disciplin tjener dit højeste formål. Dine principper guider dig til meningsfulde sejre der er ofret værd.",
+    actionTip: "Stay true to your values. Delayed gratification brings greater rewards.",
+    actionTipDa: "Forbliv tro mod dine værdier. Udskudt tilfredsstillelse bringer større belønninger.",
     category: 9
   },
   "27/9": {
     number: "27/9",
     caption: "The Self-Leader",
+    captionDa: "Selvlederen",
     description: "This vibration deals with creating strong inner self-leadership where one both does what needs to be done, but at a pace and in a way where one is true to oneself and takes care of one's needs and feelings. One is also a team leader, an authority who understands people and is motivating. There is also a tendency to work hard and complete one's ideas with success. A strong and lucky number with lots of love",
+    descriptionDa: "Denne vibration handler om at skabe stærkt indre selvlederskab hvor man både gør hvad der skal gøres, men i et tempo og på en måde hvor man er tro mod sig selv og tager sig af sine behov og følelser. Man er også en teamleder, en autoritet der forstår mennesker og er motiverende. Der er også en tendens til at arbejde hårdt og fuldende sine idéer med succes. Et stærkt og heldigt tal med masser af kærlighed.",
+    shortDescription: "Lead yourself first, then inspire others. Your balanced authority motivates teams toward success.",
+    shortDescriptionDa: "Led dig selv først, inspirer så andre. Din balancerede autoritet motiverer teams mod succes.",
+    actionTip: "Model what you teach. Your self-mastery is your greatest leadership tool.",
+    actionTipDa: "Modeller hvad du underviser. Din selvbeherskelse er dit største ledelsesværktøj.",
     category: 9
   },
   "36/9": {
     number: "36/9",
     caption: "The Magical Leader",
+    captionDa: "Den Magiske Leder",
     description: "This vibration deals with leadership, success and expansion. With its 3-6-9 triad it is one of the most treasured 9 numbers, which gives a 'magical' strength where one manages to attract what one desires in life. It adds personal power and strength, intelligence, leadership and the ability to create something big and meaningful in the world. Strong and goal-oriented and a bit 'egoistic and controlling'. Lucky",
+    descriptionDa: "Denne vibration handler om lederskab, succes og ekspansion. Med sin 3-6-9 triade er det et af de mest skattede 9-tal, som giver en 'magisk' styrke hvor man formår at tiltrække hvad man ønsker i livet. Det tilføjer personlig magt og styrke, intelligens, lederskab og evnen til at skabe noget stort og meningsfuldt i verden. Stærk og målrettet og lidt 'egoistisk og kontrollerende'. Heldig.",
+    shortDescription: "Magical leadership flows through you. Attract what you desire by creating meaningful impact in the world.",
+    shortDescriptionDa: "Magisk lederskab flyder gennem dig. Tiltræk hvad du ønsker ved at skabe meningsfuld indflydelse i verden.",
+    actionTip: "Dream big, then execute. Your 3-6-9 power manifests when vision meets action.",
+    actionTipDa: "Drøm stort, derefter eksekvér. Din 3-6-9 kraft manifesterer når vision møder handling.",
     category: 9
   },
   "45/9": {

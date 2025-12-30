@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star, Gem } from 'lucide-react';
 import { calculateNumerologyData, type NumerologyData } from '@/utils/numerology';
 import { generateNumerologySummary, type AISummary } from '@/services/aiService';
-import { generateCosmicAvatar } from '@/services/avatarService';
 import { useAuth } from '@/context/AuthContext';
 import { getTalismanConfig, type TalismanConfig } from '@/services/talismanService';
+import { getArchetypeInfo, type ArchetypeInfo } from '@/services/archetypeService';
+import { useLanguage } from '@/context/LanguageContext';
 import html2canvas from 'html2canvas-pro';
 
 interface ShareableReadingPageProps {
@@ -40,13 +42,15 @@ export interface DiamondData extends NumerologyData {
 }
 
 export default function ShareableReadingPage({ userData, onBack }: ShareableReadingPageProps) {
-  const { selectedNFT, userPath, generatedAvatar, setGeneratedAvatar } = useAuth();
+  const navigate = useNavigate();
+  const { selectedNFT, userPath } = useAuth();
+  const { t, language } = useLanguage();
   const [readingData, setReadingData] = useState<DiamondData | null>(null);
   const [aiSummary, setAiSummary] = useState<AISummary | null>(null);
+  const [archetypeInfo, setArchetypeInfo] = useState<ArchetypeInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
   const [includeName, setIncludeName] = useState(() => {
     return localStorage.getItem('includeNameInReading') === 'true';
   });
@@ -60,7 +64,13 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   const { name, birthDate } = userData;
 
   // Loading text messages that cycle
-  const loadingMessages = [
+  const loadingMessages = language === 'da' ? [
+    "Skaber din kosmiske historie...",
+    "Konsulterer stjernerne...",
+    "Læser de himmelske mønstre...",
+    "Afslører dine hellige tal...",
+    "Kanaliserer kosmisk visdom..."
+  ] : [
     "Crafting your cosmic story...",
     "Consulting the stars...",
     "Reading the celestial patterns...",
@@ -93,7 +103,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   };
 
   useEffect(() => {
-    console.log('ShareableReadingPage useEffect - userPath:', userPath, 'generatedAvatar:', generatedAvatar);
+    console.log('ShareableReadingPage useEffect - userPath:', userPath);
 
     const currentKey = `${name}-${birthDate.toISOString()}-${userData.focusArea}`;
 
@@ -104,8 +114,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
     // Set the key IMMEDIATELY to prevent double calls in React Strict Mode
     initializationKey.current = currentKey;
 
-    const initializeReading = async () => {
-      console.log('initializeReading called - userPath:', userPath, 'generatedAvatar:', generatedAvatar);
+    // Helper to set up reading data (without API call)
+    const setupReadingData = () => {
       const numerologyData = calculateNumerologyData(name, birthDate);
 
       const data: DiamondData = {
@@ -136,35 +146,50 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
       const talisman = getTalismanConfig(data.top);
       setTalismanConfig(talisman);
 
-      // Generate AI avatar for non-WoW users
-      if (userPath === 'non-wow' && !generatedAvatar) {
-        console.log('Generating cosmic avatar for non-WoW user with gender:', userData.gender, 'birthDate:', birthDate);
-        setIsGeneratingAvatar(true);
-        try {
-          const avatarResult = await generateCosmicAvatar(numerologyData, false, userData.gender, birthDate);
-          setGeneratedAvatar(avatarResult.imageUrl);
-          console.log('Avatar generated successfully:', avatarResult.imageUrl);
-        } catch (error) {
-          console.error('Failed to generate avatar:', error);
-          // Continue without avatar - will use fallback
-        } finally {
-          setIsGeneratingAvatar(false);
-        }
+      // Get archetype info for non-WoW users (static images, no API call)
+      if (userPath === 'non-wow' || !selectedNFT) {
+        const archetype = getArchetypeInfo(data.top);
+        setArchetypeInfo(archetype);
       }
 
+      return data;
+    };
+
+    const initializeReading = async () => {
+      console.log('initializeReading called - userPath:', userPath);
+      const data = setupReadingData();
+
       try {
-        const summary = await generateNumerologySummary(data, userData.focusArea);
+        const summary = await generateNumerologySummary(data, userData.focusArea, language);
         setAiSummary(summary);
+
+        // Cache the AI summary in localStorage
+        const cacheKey = `ai_summary_${name.toLowerCase().trim()}_${birthDate.toISOString().split('T')[0]}_${language}`;
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({
+            summary,
+            timestamp: Date.now()
+          }));
+          console.log('AI summary cached in localStorage');
+        } catch {
+          console.warn('Failed to cache AI summary (localStorage quota)');
+        }
       } catch (error) {
         console.error('Failed to generate AI summary:', error);
         setAiSummary({
           archetype: {
-            title: "The Cosmic Wanderer",
-            tagline: "You walk between worlds with wisdom and grace."
+            title: language === 'da' ? "Den Kosmiske Vandrer" : "The Cosmic Wanderer",
+            tagline: language === 'da' ? "Du vandrer mellem verdener med visdom og ynde." : "You walk between worlds with wisdom and grace."
           },
-          oneLiner: "Your cosmic blueprint reveals a natural leader with deep spiritual wisdom.",
-          summary: "You are destined for significant personal transformation and growth. Your natural charisma attracts opportunities for leadership roles, and your intuitive gifts guide you through life's journey. Trust in your inner wisdom as it illuminates your path forward.",
-          highlightWords: ["Leadership", "Wisdom", "Transformation", "Intuition", "Charisma"],
+          oneLiner: language === 'da'
+            ? "Dit kosmiske fingeraftryk afslører en naturlig leder med dyb spirituel visdom."
+            : "Your cosmic blueprint reveals a natural leader with deep spiritual wisdom.",
+          summary: language === 'da'
+            ? "Du er bestemt til betydelig personlig transformation og vækst. Din naturlige karisma tiltrækker muligheder for lederroller, og dine intuitive gaver guider dig gennem livets rejse. Stol på din indre visdom, da den belyser din vej fremad."
+            : "You are destined for significant personal transformation and growth. Your natural charisma attracts opportunities for leadership roles, and your intuitive gifts guide you through life's journey. Trust in your inner wisdom as it illuminates your path forward.",
+          highlightWords: language === 'da'
+            ? ["Lederskab", "Visdom", "Transformation", "Intuition", "Karisma"]
+            : ["Leadership", "Wisdom", "Transformation", "Intuition", "Charisma"],
           visualCue: ["✨", "🌟", "🔮"]
         });
       }
@@ -172,11 +197,34 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
       setLoading(false);
     };
 
+    // Check localStorage cache first to avoid showing loading state and API call
+    const cacheKey = `ai_summary_${name.toLowerCase().trim()}_${birthDate.toISOString().split('T')[0]}_${language}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      try {
+        const { summary, timestamp } = JSON.parse(cachedData);
+        const cacheAge = Date.now() - timestamp;
+        const MAX_CACHE_AGE = 24 * 60 * 60 * 1000; // 24 hours
+
+        if (cacheAge < MAX_CACHE_AGE && summary) {
+          console.log('Using cached AI summary from localStorage (instant display)');
+          // Set up reading data without API call
+          setupReadingData();
+          setAiSummary(summary);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Cache invalid, continue normally
+      }
+    }
+
+    // No cache - show loading animation then call API
     setTimeout(() => {
       initializeReading();
     }, 2500);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, birthDate, userData.focusArea, userPath]);
+  }, [name, birthDate, userData.focusArea, userPath, language]);
 
   const handleNameToggle = () => {
     const newValue = !includeName;
@@ -519,7 +567,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
               className="bg-black/40 border-[#9B8DE3]/40 text-[#F4E8DC] hover:bg-[#9B8DE3]/20"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
-              ← Back
+              ← {language === 'da' ? 'Tilbage' : 'Back'}
             </Button>
           )}
           <div className="flex gap-3 ml-auto">
@@ -530,7 +578,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
               <Share2 className="w-4 h-4 mr-2" />
-              Share
+              {language === 'da' ? 'Del' : 'Share'}
             </Button>
             <Button
               onClick={handleDownload}
@@ -570,58 +618,45 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
           {/* NFT Integration Section - Hero */}
           <div className="relative">
             <div className="grid md:grid-cols-2 gap-0">
-              {/* Left: NFT Image or Generated Avatar */}
-              {(selectedNFT || (userPath === 'non-wow' && (generatedAvatar || isGeneratingAvatar))) && (
+              {/* Left: NFT Image or Archetype Image */}
+              {(selectedNFT || archetypeInfo) && (
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                   className="relative aspect-square md:aspect-auto"
                 >
-                  {isGeneratingAvatar ? (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1D1B3A] to-[#0C0A1E]">
-                      <div className="text-center space-y-4">
-                        <Loader2 className="w-12 h-12 text-[#9B8DE3] animate-spin mx-auto" />
-                        <p className="text-[#F4E8DC]/80 text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                          Crafting your cosmic avatar...
-                        </p>
-                      </div>
+                  <img
+                    src={selectedNFT ? selectedNFT.imageUrl : archetypeInfo?.imageUrl}
+                    alt={selectedNFT ? selectedNFT.name : (language === 'da' ? archetypeInfo?.titleDa : archetypeInfo?.title)}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* NFT info overlay or Archetype badge */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                    <div className="flex items-center gap-2">
+                      {selectedNFT ? (
+                        <>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-bold ${
+                              selectedNFT.collection === 'WoW'
+                                ? 'bg-[#9B8DE3] text-white'
+                                : 'bg-[#F8A1D1] text-white'
+                            }`}
+                          >
+                            {selectedNFT.collection}
+                          </span>
+                          <span className="text-white text-sm font-medium">
+                            #{selectedNFT.tokenId}
+                          </span>
+                        </>
+                      ) : archetypeInfo && (
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] text-white flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" />
+                          {language === 'da' ? archetypeInfo.titleDa : archetypeInfo.title}
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <>
-                      <img
-                        src={selectedNFT ? selectedNFT.imageUrl : generatedAvatar || '/placeholder-avatar.png'}
-                        alt={selectedNFT ? selectedNFT.name : 'Your Cosmic Avatar'}
-                        className="w-full h-full object-cover"
-                      />
-                      {/* NFT info overlay or AI Generated badge */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                        <div className="flex items-center gap-2">
-                          {selectedNFT ? (
-                            <>
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                  selectedNFT.collection === 'WoW'
-                                    ? 'bg-[#9B8DE3] text-white'
-                                    : 'bg-[#F8A1D1] text-white'
-                                }`}
-                              >
-                                {selectedNFT.collection}
-                              </span>
-                              <span className="text-white text-sm font-medium">
-                                #{selectedNFT.tokenId}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] text-white flex items-center gap-1">
-                              <Sparkles className="w-3 h-3" />
-                              AI Generated Avatar
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  </div>
                 </motion.div>
               )}
 
@@ -642,7 +677,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                     </div>
                     <div className="flex-1">
                       <p className="text-[#F4E8DC]/60 text-xs uppercase tracking-wide mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                        Life Path
+                        {language === 'da' ? 'Livssti' : 'Life Path'}
                       </p>
                       <h2
                         className="text-lg md:text-xl font-bold bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] bg-clip-text text-transparent leading-snug"
@@ -721,7 +756,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
               <div className="flex items-center gap-2 mb-4">
                 <Stars className="w-5 h-5 text-[#9B8DE3]" />
                 <h3 className="text-[#F4E8DC] text-lg font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
-                  Your Essence
+                  {language === 'da' ? 'Din Essens' : 'Your Essence'}
                 </h3>
               </div>
               <p
@@ -744,7 +779,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="w-4 h-4 text-[#F8A1D1]" />
                   <h4 className="text-[#F4E8DC]/80 text-sm font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                    Core Qualities
+                    {language === 'da' ? 'Kernekvaliteter' : 'Core Qualities'}
                   </h4>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -796,7 +831,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-[#9B8DE3]" />
                     <span className="text-lg font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
-                      Deep Dive Insights
+                      {language === 'da' ? 'Dybdegående Indsigter' : 'Deep Dive Insights'}
                     </span>
                   </div>
                   <motion.div
@@ -828,7 +863,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                             <div className="flex items-center gap-2">
                               <Heart className="w-4 h-4 text-[#F8A1D1]" />
                               <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                Love & Relationships
+                                {language === 'da' ? 'Kærlighed & Relationer' : 'Love & Relationships'}
                               </h5>
                             </div>
                             <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -848,7 +883,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                             <div className="flex items-center gap-2">
                               <Briefcase className="w-4 h-4 text-[#9B8DE3]" />
                               <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                Career Gifts
+                                {language === 'da' ? 'Karrieregaver' : 'Career Gifts'}
                               </h5>
                             </div>
                             <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -868,7 +903,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                             <div className="flex items-center gap-2">
                               <Sparkles className="w-4 h-4 text-[#F8A1D1]" />
                               <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                Spiritual Gifts
+                                {language === 'da' ? 'Spirituelle Gaver' : 'Spiritual Gifts'}
                               </h5>
                             </div>
                             <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -888,7 +923,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                             <div className="flex items-center gap-2">
                               <TrendingUp className="w-4 h-4 text-[#9B8DE3]" />
                               <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                Growth Path
+                                {language === 'da' ? 'Vækstvej' : 'Growth Path'}
                               </h5>
                             </div>
                             <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -909,7 +944,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           <div className="flex items-center justify-center gap-2 mb-4">
                             <Stars className="w-4 h-4 text-[#9B8DE3]" />
                             <h5 className="text-[#F4E8DC] text-sm font-semibold text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                              Your Sacred Numbers Diamond
+                              {language === 'da' ? 'Din Hellige Taldiamant' : 'Your Sacred Numbers Diamond'}
                             </h5>
                             <Stars className="w-4 h-4 text-[#9B8DE3]" />
                           </div>
@@ -1020,7 +1055,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           </div>
 
                           <p className="text-[#F4E8DC]/60 text-xs text-center mt-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                            Your numerological blueprint visualized
+                            {language === 'da' ? 'Dit numerologiske fingeraftryk visualiseret' : 'Your numerological blueprint visualized'}
                           </p>
                         </motion.div>
                       )}
@@ -1036,7 +1071,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           <div className="flex items-center gap-2 mb-2">
                             <Star className="w-4 h-4 text-[#F8A1D1]" />
                             <h5 className="text-[#F4E8DC] text-sm font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                              Cosmic Fortune
+                              {language === 'da' ? 'Kosmisk Formue' : 'Cosmic Fortune'}
                             </h5>
                           </div>
                           <p className="text-[#F4E8DC]/80 text-sm leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -1065,7 +1100,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                   <div className="flex items-center gap-2">
                     <Gem className="w-5 h-5 text-[#F8A1D1]" />
                     <span className="text-lg font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
-                      Your Sacred Crystal
+                      {language === 'da' ? 'Din Hellige Krystal' : 'Your Sacred Crystal'}
                     </span>
                   </div>
                   <motion.div
@@ -1118,8 +1153,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           >
                             {talismanConfig.crystal}
                           </h4>
-                          <p className="text-[#F8A1D1] text-sm italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                            The stone of {talismanConfig.meaning}
+                          <p className="text-[#F8A1D1] text-base italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            {language === 'da' ? `Stenen for ${talismanConfig.meaning}` : `The stone of ${talismanConfig.meaning}`}
                           </p>
                         </motion.div>
 
@@ -1140,10 +1175,12 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.4 }}
-                          className="text-[#F4E8DC]/60 text-xs text-center italic"
+                          className="text-[#F4E8DC]/70 text-base text-center italic"
                           style={{ fontFamily: "'Cormorant Garamond', serif" }}
                         >
-                          "Each crystal is hand-selected for its spiritual energy and natural beauty. The one that arrives is the one meant for you."
+                          {language === 'da'
+                            ? '"Hver krystal er håndudvalgt for dens spirituelle energi og naturlige skønhed. Den der ankommer, er den der er bestemt for dig."'
+                            : '"Each crystal is hand-selected for its spiritual energy and natural beauty. The one that arrives is the one meant for you."'}
                         </motion.p>
 
                         {/* CTA Button */}
@@ -1154,15 +1191,12 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           className="flex justify-center pt-2"
                         >
                           <Button
-                            onClick={() => {
-                              // TODO: Navigate to talisman page when implemented
-                              console.log('Navigate to talisman page');
-                            }}
+                            onClick={() => navigate('/talisman')}
                             className="bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white px-8 py-3 rounded-xl shadow-lg shadow-[#9B8DE3]/30"
                             style={{ fontFamily: "'Poppins', sans-serif" }}
                           >
                             <Gem className="w-4 h-4 mr-2" />
-                            Claim Your Talisman
+                            {language === 'da' ? 'Gør Krav På Din Talisman' : 'Claim Your Talisman'}
                           </Button>
                         </motion.div>
 
@@ -1171,14 +1205,14 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.6 }}
-                          className="flex justify-center gap-4 text-xs text-[#F4E8DC]/50"
+                          className="flex justify-center gap-4 text-sm text-[#F4E8DC]/60"
                           style={{ fontFamily: "'Poppins', sans-serif" }}
                         >
                           <span>{talismanConfig.metalDisplay}</span>
                           <span>•</span>
-                          <span>Natural Crystal</span>
+                          <span>{language === 'da' ? 'Naturlig Krystal' : 'Natural Crystal'}</span>
                           <span>•</span>
-                          <span>Certificate of Authenticity</span>
+                          <span>{language === 'da' ? 'Ægthedsbevis' : 'Certificate of Authenticity'}</span>
                         </motion.div>
                       </div>
                     </motion.div>
@@ -1205,7 +1239,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
             className="w-5 h-5 rounded accent-[#9B8DE3]"
           />
           <span className="text-[#F4E8DC] text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            Include my name in the card
+            {language === 'da' ? 'Inkluder mit navn i kortet' : 'Include my name in the card'}
           </span>
         </label>
       </motion.div>
@@ -1228,7 +1262,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
               className="bg-gradient-to-br from-[#1D1B3A] to-[#0C0A1E] p-8 rounded-2xl border border-[#9B8DE3]/40 max-w-md w-full"
             >
               <h3 className="text-2xl font-bold text-[#F4E8DC] mb-6 text-center" style={{ fontFamily: "'Cinzel', serif" }}>
-                Share Your Reading
+                {language === 'da' ? 'Del Din Læsning' : 'Share Your Reading'}
               </h3>
 
               <div className="space-y-4">
@@ -1237,7 +1271,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                   className="w-full bg-black hover:bg-black/80 text-white flex items-center justify-center gap-3 py-6"
                 >
                   <Twitter className="w-5 h-5" />
-                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>Share on X (Twitter)</span>
+                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>{language === 'da' ? 'Del på X (Twitter)' : 'Share on X (Twitter)'}</span>
                 </Button>
 
                 <Button
@@ -1250,7 +1284,7 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                   ) : (
                     <Instagram className="w-5 h-5" />
                   )}
-                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>Share on Instagram</span>
+                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>{language === 'da' ? 'Del på Instagram' : 'Share on Instagram'}</span>
                 </Button>
 
                 <Button
@@ -1264,12 +1298,12 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                   ) : (
                     <Download className="w-5 h-5" />
                   )}
-                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>Download Image</span>
+                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>{language === 'da' ? 'Download Billede' : 'Download Image'}</span>
                 </Button>
               </div>
 
               <p className="text-[#F4E8DC]/60 text-xs text-center mt-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                Your numerology reading aligned with your World of Women spirit ✨
+                {language === 'da' ? 'Din numerologiske læsning tilpasset din kosmiske ånd ✨' : 'Your numerology reading aligned with your cosmic spirit ✨'}
               </p>
             </motion.div>
           </motion.div>

@@ -3,18 +3,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Stars, Sparkles, Loader2, X, User } from 'lucide-react';
+import { CalendarIcon, Stars, Sparkles, Loader2, X } from 'lucide-react';
 import "react-day-picker/style.css";
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { NFTSelector } from '@/components/NFTSelector';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { fetchUserWoWNFTs } from '@/services/nft';
 import { sanitizeNameForCalculation } from '@/utils/numerology';
 
@@ -37,18 +38,19 @@ const formSchema = z.object({
     message: 'Your cosmic birth date is required to unlock your numerology blueprint.',
   }),
   collection: z.enum(['all', 'WoW', 'WoWG']),
-  gender: z.enum(['woman', 'man', 'non-binary']).optional(),
+  focusArea: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 interface IndividualReadingPageProps {
-  onUnLock: (data: { name: string; birthDate: Date; focusArea: string; gender?: 'woman' | 'man' | 'non-binary' }) => void;
+  onUnLock: (data: { name: string; birthDate: Date; focusArea: string }) => void;
   onBack?: () => void;
 }
 
 export default function IndividualReadingPage({ onUnLock }: IndividualReadingPageProps) {
   const { wowNFTs, selectedNFT, setWowNFTs, setSelectedNFT, userPath } = useAuth();
+  const { t } = useLanguage();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -63,6 +65,7 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
     defaultValues: {
       name: '',
       collection: 'all',
+      focusArea: '',
     },
   });
 
@@ -134,19 +137,10 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
       return;
     }
 
-    // Require gender for non-WoW path
-    if (isNonWowPath && !data.gender) {
-      form.setError('gender', {
-        message: 'Please select how you identify to personalize your cosmic avatar',
-      });
-      return;
-    }
-
     onUnLock({
       name: data.name,
       birthDate: data.birthDate,
-      focusArea: 'general', // Keep for compatibility
-      gender: isNonWowPath ? data.gender : undefined,
+      focusArea: data.focusArea || 'general',
     });
   };
 
@@ -177,39 +171,33 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
       />
 
       <div className="w-full max-w-2xl mx-auto relative z-20">
+        {/* Logo and Title - Floating outside card like landing page */}
+        <div className="text-center mb-8">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <img src="/logo_transp.png" alt="The Infinity Compass" className="h-24 w-auto" />
+          </div>
+
+          {/* Title */}
+          <h1
+            className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[#9B8DE3] via-[#F8A1D1] to-[#6BCFF6] bg-clip-text text-transparent"
+            style={{ fontFamily: "'Cinzel', serif" }}
+          >
+            The Infinity Compass
+          </h1>
+
+          {/* Subtitle */}
+          <p
+            className="text-[#F4E8DC]/90 text-lg mt-4 leading-relaxed px-4"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
+            {t.entrySubtitle}
+          </p>
+        </div>
+
+        {/* Form Card - Starts from "Enter Your Details" */}
         <Card className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/30 to-[#0C0A1E]/30 border-[#9B8DE3]/40 shadow-2xl hover:shadow-[#9B8DE3]/30 transition-all duration-500">
-          <CardHeader className="text-center">
-            {/* Logo */}
-            <div className="flex justify-center mb-6">
-              <img src="/logo_transp.png" alt="The Infinity Compass" className="h-24 w-auto" />
-            </div>
-
-            {/* Original decorative line - commented out */}
-            {/* <div className="flex items-center justify-center space-x-2 mb-4">
-              <Stars className="w-6 h-6 text-[#F8A1D1] animate-pulse" />
-              <div className="h-px bg-gradient-to-r from-transparent via-[#9B8DE3] to-transparent w-20"></div>
-              <Sparkles className="w-6 h-6 text-[#6BCFF6] animate-pulse" style={{ animationDelay: '0.5s' }} />
-            </div> */}
-
-            <h1
-              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[#9B8DE3] via-[#F8A1D1] to-[#6BCFF6] bg-clip-text text-transparent"
-              style={{ fontFamily: "'Cinzel', serif" }}
-            >
-              The Infinity Compass
-            </h1>
-
-            <p
-              className="text-[#F4E8DC]/90 text-lg mt-4 leading-relaxed px-4"
-              style={{ fontFamily: "'Cormorant Garamond', serif" }}
-            >
-              {isNonWowPath
-                ? "Discover your cosmic blueprint through the ancient wisdom of numerology"
-                : "Unite your World of Women energy with the ancient wisdom of numerology"
-              }
-            </p>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
             {/* Wallet Input Section - Only for WoW path */}
             {!isNonWowPath && showWalletInput && (
               <div className="space-y-4">
@@ -354,14 +342,14 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                       className="text-2xl text-[#F4E8DC] font-semibold"
                       style={{ fontFamily: "'Cinzel', serif" }}
                     >
-                      {isNonWowPath ? "Enter Your Details" : "Almost There!"}
+                      {isNonWowPath ? t.entryHeading : "Almost There!"}
                     </h3>
                     <p
                       className="text-[#F4E8DC]/70 text-base"
                       style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
                       {isNonWowPath
-                        ? "Share your name and birth date to unlock your cosmic reading"
+                        ? t.entryDescription
                         : "Just 2 more things to unlock your reading"
                       }
                     </p>
@@ -377,11 +365,11 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                           style={{ fontFamily: "'Cinzel', serif" }}
                         >
                           <Stars className="w-5 h-5 text-[#F8A1D1]" />
-                          <span>Your Birth Name</span>
+                          <span>{t.labelName}</span>
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter your full birth name"
+                            placeholder={t.placeholderName}
                             className="bg-black/40 border-[#9B8DE3]/40 text-[#F4E8DC] placeholder:text-[#F4E8DC]/40 focus:border-[#F8A1D1] focus:ring-2 focus:ring-[#F8A1D1]/20 focus:bg-black/50 h-16 text-xl font-medium autofill:bg-black/40 autofill:text-[#F4E8DC]"
                             style={{ fontFamily: "'Poppins', sans-serif" }}
                             {...field}
@@ -402,7 +390,7 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                           style={{ fontFamily: "'Cinzel', serif" }}
                         >
                           <Sparkles className="w-5 h-5 text-[#6BCFF6]" />
-                          <span>Your Birth Date</span>
+                          <span>{t.labelBirthDate}</span>
                         </FormLabel>
                         <div className="relative">
                           <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
@@ -417,7 +405,7 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                                   {field.value ? (
                                     <span className="text-white font-medium">{format(field.value, 'dd/MM/yyyy')}</span>
                                   ) : (
-                                    <span className="text-[#F4E8DC]/60">Select your birth date</span>
+                                    <span className="text-[#F4E8DC]/60">{t.placeholderBirthDate}</span>
                                   )}
                                 </Button>
                               </FormControl>
@@ -474,50 +462,6 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                     )}
                   />
 
-                  {/* Gender selector - Only for non-WoW path */}
-                  {isNonWowPath && (
-                    <FormField
-                      control={form.control}
-                      name="gender"
-                      render={({ field }) => (
-                        <FormItem className="space-y-3">
-                          <FormLabel
-                            className="text-[#F4E8DC] font-semibold text-lg flex items-center space-x-2"
-                            style={{ fontFamily: "'Cinzel', serif" }}
-                          >
-                            <User className="w-5 h-5 text-[#9B8DE3]" />
-                            <span>I Identify As</span>
-                          </FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="w-full bg-black/40 border-[#9B8DE3]/40 text-white h-16 text-xl">
-                                <SelectValue placeholder="Select how you identify" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-[#1D1B3A]/95 border-[#9B8DE3]/40 backdrop-blur-md">
-                              <SelectItem value="woman" className="text-white hover:bg-[#9B8DE3]/30 text-lg py-3">
-                                Woman
-                              </SelectItem>
-                              <SelectItem value="man" className="text-white hover:bg-[#9B8DE3]/30 text-lg py-3">
-                                Man
-                              </SelectItem>
-                              <SelectItem value="non-binary" className="text-white hover:bg-[#9B8DE3]/30 text-lg py-3">
-                                Non-binary
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <p
-                            className="text-[#F4E8DC]/60 text-xs"
-                            style={{ fontFamily: "'Poppins', sans-serif" }}
-                          >
-                            This helps us create a personalized cosmic avatar for your reading
-                          </p>
-                          <FormMessage className="text-[#F8A1D1] font-medium" />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-
                   {form.formState.errors.root && (
                     <p className="text-[#F8A1D1] text-base text-center font-medium">
                       {form.formState.errors.root.message}
@@ -530,23 +474,17 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                     style={{ fontFamily: "'Cinzel', serif" }}
                   >
                     <Stars className="w-6 h-6 mr-2 animate-pulse" />
-                    Generate My Reading
+                    {t.btnGenerateReading}
                     <Sparkles className="w-6 h-6 ml-2 animate-pulse" style={{ animationDelay: '0.5s' }} />
                   </Button>
 
                   {/* Privacy Message - After submit */}
-                  <div className="pt-4 space-y-3">
+                  <div className="pt-4">
                     <p
                       className="text-[#F4E8DC]/60 text-xs text-center"
                       style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
-                      🔒 Your name and birthdate are used locally to calculate your numerology. We never store or transmit this data.
-                    </p>
-                    <p
-                      className="text-[#F4E8DC]/80 text-base text-center italic leading-relaxed"
-                      style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                    >
-                      ✨ Your name and birth date hold significant energy and influence over your life's path.
+                      {t.entryPrivacyNote}
                     </p>
                   </div>
                 </form>
