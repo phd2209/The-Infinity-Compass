@@ -17,7 +17,7 @@ const getEnergyVisualPrompt = (
 ): string => {
   // Extract the base number for visual mapping
   const baseNumber = parseInt(energyNumber.split('/')[0]) || parseInt(energyNumber);
-
+  console.log(description)
   // Base visual elements mapped to numerology meanings
   const visualElements: Record<number, string> = {
     // Single digits (1-9)

@@ -44,7 +44,7 @@ export interface DiamondData extends NumerologyData {
 export default function ShareableReadingPage({ userData, onBack }: ShareableReadingPageProps) {
   const navigate = useNavigate();
   const { selectedNFT, userPath } = useAuth();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [readingData, setReadingData] = useState<DiamondData | null>(null);
   const [aiSummary, setAiSummary] = useState<AISummary | null>(null);
   const [archetypeInfo, setArchetypeInfo] = useState<ArchetypeInfo | null>(null);

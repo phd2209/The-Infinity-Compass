@@ -48,7 +48,7 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
   // Energy card AI generation state
   const [energyCardUrl, setEnergyCardUrl] = useState<string | null>(null);
   const [isGeneratingCard, setIsGeneratingCard] = useState(false);
-  const [cardGenerationError, setCardGenerationError] = useState<string | null>(null);
+  const [, setCardGenerationError] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [includeName, setIncludeName] = useState(() => {
     return localStorage.getItem('includeNameInEnergyCard') === 'true';
