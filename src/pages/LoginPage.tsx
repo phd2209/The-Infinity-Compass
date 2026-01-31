@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Eye, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, ArrowRight, Globe, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getDiscordAuthUrl } from '@/config/discord';
 import { DemoModal } from '@/components/DemoModal';
@@ -15,6 +15,19 @@ export default function LoginPage() {
   const { t, language, setLanguage } = useLanguage();
   const [greeting, setGreeting] = useState('');
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     // Select random greeting on mount
@@ -104,6 +117,58 @@ export default function LoginPage() {
         </svg>
       </div>
 
+      {/* Language Toggle - Top Right */}
+      <div className="absolute top-4 right-4 z-20" ref={langDropdownRef}>
+        <button
+          onClick={() => setIsLangOpen(!isLangOpen)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1033]/60 backdrop-blur-sm border border-[#9B8DE3]/30 hover:border-[#9B8DE3]/50 transition-all duration-300"
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+        >
+          <Globe className="w-4 h-4 text-[#9B8DE3]" />
+          <span className="text-sm text-[#F4E8DC]">{language === 'en' ? 'EN' : 'DA'}</span>
+          <ChevronDown className={`w-4 h-4 text-[#F4E8DC]/60 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        <AnimatePresence>
+          {isLangOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 mt-2 w-36 rounded-lg bg-[#1a1033]/95 backdrop-blur-md border border-[#9B8DE3]/30 shadow-xl overflow-hidden"
+            >
+              <button
+                onClick={() => { setLanguage('en'); setIsLangOpen(false); }}
+                className={`w-full px-4 py-3 text-left text-sm flex items-center gap-2 transition-colors ${
+                  language === 'en'
+                    ? 'bg-[#9B8DE3]/20 text-[#F4E8DC]'
+                    : 'text-[#F4E8DC]/70 hover:bg-[#9B8DE3]/10 hover:text-[#F4E8DC]'
+                }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <span className="text-base">🇬🇧</span>
+                <span>English</span>
+                {language === 'en' && <span className="ml-auto text-[#9B8DE3]">✓</span>}
+              </button>
+              <button
+                onClick={() => { setLanguage('da'); setIsLangOpen(false); }}
+                className={`w-full px-4 py-3 text-left text-sm flex items-center gap-2 transition-colors ${
+                  language === 'da'
+                    ? 'bg-[#F8A1D1]/20 text-[#F4E8DC]'
+                    : 'text-[#F4E8DC]/70 hover:bg-[#F8A1D1]/10 hover:text-[#F4E8DC]'
+                }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <span className="text-base">🇩🇰</span>
+                <span>Dansk</span>
+                {language === 'da' && <span className="ml-auto text-[#F8A1D1]">✓</span>}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12">
         {/* Hero Section */}
@@ -165,22 +230,31 @@ export default function LoginPage() {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="mb-8 flex flex-col items-center"
         >
-          <motion.img
-            src="/fortune-teller-1.png"
-            alt="Fortune Teller"
-            animate={{ y: [0, -6, 0] }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="w-28 h-28 object-contain drop-shadow-[0_0_20px_rgba(248,161,209,0.4)] mb-3"
-          />
+          {/* Glow/halo behind fortune teller */}
+          <div className="relative">
+            <div
+              className="absolute inset-0 -z-10 scale-[2] blur-2xl opacity-60"
+              style={{
+                background: 'radial-gradient(circle, rgba(248,161,209,0.4) 0%, rgba(155,141,227,0.3) 40%, transparent 70%)'
+              }}
+            />
+            <motion.img
+              src="/fortune-teller-1.png"
+              alt="Fortune Teller"
+              animate={{ y: [0, -6, 0] }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-28 h-28 object-contain drop-shadow-[0_0_25px_rgba(248,161,209,0.5)] mb-3"
+            />
+          </div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="text-[#F4E8DC]/80 italic text-lg md:text-xl"
+            className="text-[#F4E8DC] italic text-lg md:text-xl drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             {greeting}
@@ -294,43 +368,9 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Language Selection */}
-              <div className="mb-6">
-                <p
-                  className="text-sm text-[#F4E8DC]/70 mb-3 text-center"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  {language === 'da' ? 'Vælg din oplevelse' : 'Choose your experience'}
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <button
-                    onClick={() => setLanguage('en')}
-                    className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
-                      language === 'en'
-                        ? 'border-[#9B8DE3] bg-[#9B8DE3]/20 text-[#F4E8DC]'
-                        : 'border-[#9B8DE3]/30 bg-transparent text-[#F4E8DC]/60 hover:border-[#9B8DE3]/50 hover:text-[#F4E8DC]/80'
-                    }`}
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    <span className="font-medium">English</span>
-                  </button>
-                  <button
-                    onClick={() => setLanguage('da')}
-                    className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
-                      language === 'da'
-                        ? 'border-[#F8A1D1] bg-[#F8A1D1]/20 text-[#F4E8DC]'
-                        : 'border-[#F8A1D1]/30 bg-transparent text-[#F4E8DC]/60 hover:border-[#F8A1D1]/50 hover:text-[#F4E8DC]/80'
-                    }`}
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    <span className="font-medium">Dansk</span>
-                  </button>
-                </div>
-              </div>
-
               <Button
                 onClick={handleEnter}
-                className="w-full cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
+                className="w-full max-w-[320px] mx-auto cursor-pointer bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white font-semibold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(155,141,227,0.5)]"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
                 <ArrowRight className="w-6 h-6 mr-2" />
@@ -339,7 +379,7 @@ export default function LoginPage() {
 
               {/* Privacy note below button */}
               <p
-                className="text-xs text-[#F4E8DC]/60 pt-4"
+                className="text-xs text-[#F4E8DC]/70 pt-4"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
                 {t.privacyNote}

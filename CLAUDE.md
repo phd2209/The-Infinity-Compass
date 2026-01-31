@@ -448,7 +448,7 @@ After receiving their numerology reading, users can purchase a personalized crys
 
 - Crystal type determined by **birth day reduced to single digit** (1-9)
 - **Natural raw/tumbled crystal** (not polished geometric cuts)
-- **Bail cap design** with engraved birth number
+- **Bail cap design** with engraved birth number laser engraving OR deep mechanical engraving
 - Sterling silver or gold vermeil metals
 - Luxury packaging with certificate of authenticity
 - **9 representative images** (one per crystal type)
@@ -470,10 +470,10 @@ After receiving their numerology reading, users can purchase a personalized crys
 ```
 
 **Design Elements:**
-- **Crystal:** Natural tumbled or raw form, 20-30mm
+- **Crystal:** Natural tumbled or raw form, 22–26mm Reject outliers
 - **Bail cap:** Metal cap that grips the crystal top
 - **Engraving:** Single digit (1-9) on bail cap front
-- **Chain:** Matching metal, 18" princess length
+- **Chain:** Matching metal, 18" princess length, 1.3–1.6mm cable chain minimum, Lobster clasp, not spring ring
 - **No name engraving** - keeps it cleaner, number is the personalization
 
 #### Numerology-to-Crystal Mapping
@@ -496,14 +496,14 @@ After receiving their numerology reading, users can purchase a personalized crys
 
 **Crystal:**
 - Form: Natural tumbled or raw (not faceted/cabochon)
-- Size: 20-30mm
+- Size: 22–26mm
 - Grade: Hand-selected, higher quality specimens
 - Each piece unique (natural variation is a feature)
 
 **Bail Cap:**
 - Material: Sterling silver (.925) or 18K gold vermeil
 - Design: Clean cap that grips crystal top
-- Engraving: Single digit, 3-4mm, sans-serif font
+- Engraving: Single digit, 3-4mm, sans-serif font laser engraving OR deep mechanical engraving
 - Stamped with .925 or metal purity mark
 
 **Chain:**

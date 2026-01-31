@@ -3,7 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Stars, Sparkles, Loader2, X } from 'lucide-react';
+import { enUS, da } from 'date-fns/locale';
+import { CalendarIcon, Stars, Sparkles, Loader2, X, ArrowLeft } from 'lucide-react';
 import "react-day-picker/style.css";
 
 import { Button } from '@/components/ui/button';
@@ -48,9 +49,16 @@ interface IndividualReadingPageProps {
   onBack?: () => void;
 }
 
-export default function IndividualReadingPage({ onUnLock }: IndividualReadingPageProps) {
+// Map language codes to date-fns locales
+const localeMap = {
+  en: enUS,
+  da: da,
+};
+
+export default function IndividualReadingPage({ onUnLock, onBack }: IndividualReadingPageProps) {
   const { wowNFTs, selectedNFT, setWowNFTs, setSelectedNFT, userPath } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const calendarLocale = localeMap[language] || enUS;
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -88,26 +96,21 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
 
   const handleFetchNFTs = async () => {
     if (!walletAddress) {
-      console.log('No wallet address provided');
       return;
     }
 
-    console.log('Fetching NFTs for wallet:', walletAddress);
     setIsLoadingNFTs(true);
     setNoNFTsFound(false);
     try {
       const nfts = await fetchUserWoWNFTs(walletAddress);
-      console.log('Fetched NFTs:', nfts);
       setWowNFTs(nfts);
       if (nfts.length > 0) {
         setShowWalletInput(false);
         setNoNFTsFound(false);
       } else {
-        console.log('No NFTs found for this wallet');
         setNoNFTsFound(true);
       }
-    } catch (error) {
-      console.error('Failed to fetch NFTs:', error);
+    } catch {
       alert('Failed to load NFTs. Please check your wallet address and try again.');
     } finally {
       setIsLoadingNFTs(false);
@@ -171,6 +174,18 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
       />
 
       <div className="w-full max-w-2xl mx-auto relative z-20">
+        {/* Back Button */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mb-6 flex items-center gap-2 text-[#F4E8DC]/70 hover:text-[#F8A1D1] transition-colors group"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm">{t.btnBack || 'Back'}</span>
+          </button>
+        )}
+
         {/* Logo and Title - Floating outside card like landing page */}
         <div className="text-center mb-8">
           {/* Logo */}
@@ -196,7 +211,9 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
         </div>
 
         {/* Form Card - Starts from "Enter Your Details" */}
-        <Card className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/30 to-[#0C0A1E]/30 border-[#9B8DE3]/40 shadow-2xl hover:shadow-[#9B8DE3]/30 transition-all duration-500">
+        {/* Gradient border wrapper - 2px visible border as per design recommendation */}
+        <div className="p-[2px] rounded-xl bg-gradient-to-br from-[#9B8DE3] via-[#F8A1D1] to-[#9B8DE3] shadow-2xl hover:shadow-[#9B8DE3]/30 transition-all duration-500">
+        <Card className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-0 rounded-[10px]">
           <CardContent className="space-y-6 pt-6">
             {/* Wallet Input Section - Only for WoW path */}
             {!isNonWowPath && showWalletInput && (
@@ -361,16 +378,16 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                     render={({ field }) => (
                       <FormItem className="space-y-3">
                         <FormLabel
-                          className="text-[#F4E8DC] font-semibold text-lg flex items-center space-x-2"
+                          className="text-[#F4E8DC] font-semibold text-lg flex items-center space-x-2 group cursor-pointer"
                           style={{ fontFamily: "'Cinzel', serif" }}
                         >
-                          <Stars className="w-5 h-5 text-[#F8A1D1]" />
+                          <Stars className="w-5 h-5 text-[#F8A1D1] twinkle-on-hover" />
                           <span>{t.labelName}</span>
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder={t.placeholderName}
-                            className="bg-black/40 border-[#9B8DE3]/40 text-[#F4E8DC] placeholder:text-[#F4E8DC]/40 focus:border-[#F8A1D1] focus:ring-2 focus:ring-[#F8A1D1]/20 focus:bg-black/50 h-16 text-xl font-medium autofill:bg-black/40 autofill:text-[#F4E8DC]"
+                            className="bg-black/40 border-[#9B8DE3]/40 text-[#F4E8DC] placeholder:text-[#F4E8DC]/40 focus:border-[#F8A1D1] focus:ring-2 focus:ring-[#F8A1D1]/30 focus:bg-black/50 h-16 text-xl font-medium autofill:bg-black/40 autofill:text-[#F4E8DC] transition-all duration-300 focus:shadow-[0_0_20px_rgba(248,161,209,0.3)]"
                             style={{ fontFamily: "'Poppins', sans-serif" }}
                             {...field}
                           />
@@ -386,10 +403,10 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                     render={({ field }) => (
                       <FormItem className="space-y-3">
                         <FormLabel
-                          className="text-[#F4E8DC] font-semibold text-lg flex items-center space-x-2"
+                          className="text-[#F4E8DC] font-semibold text-lg flex items-center space-x-2 group cursor-pointer"
                           style={{ fontFamily: "'Cinzel', serif" }}
                         >
-                          <Sparkles className="w-5 h-5 text-[#6BCFF6]" />
+                          <Sparkles className="w-5 h-5 text-[#6BCFF6] twinkle-on-hover" />
                           <span>{t.labelBirthDate}</span>
                         </FormLabel>
                         <div className="relative">
@@ -398,7 +415,7 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                               <FormControl>
                                 <Button
                                   variant="outline"
-                                  className="w-full justify-start bg-black/40 border-[#9B8DE3]/40 text-white hover:bg-black/50 hover:border-[#F8A1D1] h-16 text-xl pr-12"
+                                  className="w-full justify-start bg-black/40 border-[#9B8DE3]/40 text-white hover:bg-black/50 hover:border-[#F8A1D1] h-16 text-xl pr-12 transition-all duration-300 focus:border-[#F8A1D1] focus:shadow-[0_0_20px_rgba(248,161,209,0.3)]"
                                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                                 >
                                   <CalendarIcon className="mr-3 h-6 w-6 text-[#9B8DE3]" />
@@ -441,6 +458,11 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
                               defaultMonth={field.value || new Date(1990, 0)}
                               captionLayout="dropdown"
                               showOutsideDays={false}
+                              locale={calendarLocale}
+                              formatters={{
+                                formatMonthDropdown: (date) =>
+                                  format(date, 'MMM', { locale: calendarLocale }),
+                              }}
                             />
                           </PopoverContent>
                         </Popover>
@@ -492,6 +514,7 @@ export default function IndividualReadingPage({ onUnLock }: IndividualReadingPag
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

@@ -17,7 +17,6 @@ const getEnergyVisualPrompt = (
 ): string => {
   // Extract the base number for visual mapping
   const baseNumber = parseInt(energyNumber.split('/')[0]) || parseInt(energyNumber);
-  console.log(description)
   // Base visual elements mapped to numerology meanings
   const visualElements: Record<number, string> = {
     // Single digits (1-9)
@@ -113,10 +112,7 @@ export const generateEnergyCard = async (
   shortDescription: string,
   forceRegenerate: boolean = false
 ): Promise<EnergyCardGenerationResult> => {
-  console.log('Energy Card Service - Generating card for:', energyNumber);
-
   const prompt = generateEnergyCardPrompt(energyNumber, caption, shortDescription);
-  console.log('Generated prompt:', prompt);
 
   // Create cache key based on energy number (cards are the same for same number)
   const cacheKey = `energy_card_${energyNumber.replace('/', '_')}`;
@@ -131,18 +127,15 @@ export const generateEnergyCard = async (
         const MAX_CACHE_AGE = 1 * 60 * 60 * 1000; // 1 hour (Replicate URLs can expire quickly)
 
         if (cacheAge < MAX_CACHE_AGE && imageUrl) {
-          console.log('Using cached energy card (age:', Math.round(cacheAge / 1000 / 60), 'minutes)');
           return {
             imageUrl,
             prompt,
             cached: true
           };
         } else {
-          console.log('Cached energy card expired, regenerating...');
           localStorage.removeItem(cacheKey);
         }
       } catch {
-        console.log('Old cache format detected, removing...');
         localStorage.removeItem(cacheKey);
       }
     }
@@ -169,7 +162,6 @@ export const generateEnergyCard = async (
     }
 
     const result = await response.json();
-    console.log('API Response:', JSON.stringify(result, null, 2));
 
     if (!result.imageUrl) {
       console.error('No imageUrl in response:', result);
@@ -188,7 +180,6 @@ export const generateEnergyCard = async (
           imageUrl: base64Image,
           timestamp: Date.now()
         }));
-        console.log('Energy card generated and stored as base64');
         finalImageUrl = base64Image;
       } catch (storageError) {
         // localStorage quota exceeded - use URL directly (will work for this session)
@@ -219,7 +210,6 @@ export const generateEnergyCard = async (
 export const clearEnergyCardCache = (energyNumber: string): void => {
   const cacheKey = `energy_card_${energyNumber.replace('/', '_')}`;
   localStorage.removeItem(cacheKey);
-  console.log('Energy card cache cleared for:', energyNumber);
 };
 
 /**
@@ -237,7 +227,6 @@ const clearOldEnergyCardCaches = (): void => {
 
   keysToRemove.forEach(key => {
     localStorage.removeItem(key);
-    console.log('Cleared old energy card cache:', key);
   });
 };
 
@@ -247,8 +236,6 @@ const clearOldEnergyCardCaches = (): void => {
  */
 const convertImageToBase64 = async (imageUrl: string): Promise<string> => {
   try {
-    console.log('Converting image to base64:', imageUrl);
-
     // Fetch the image
     const response = await fetch(imageUrl);
     if (!response.ok) {
@@ -263,7 +250,6 @@ const convertImageToBase64 = async (imageUrl: string): Promise<string> => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        console.log('Image converted to base64, length:', base64.length);
         resolve(base64);
       };
       reader.onerror = () => {

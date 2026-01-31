@@ -8,7 +8,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Download, Sparkles, Loader2, Twitter, Instagram } from 'lucide-react';
+import { Share2, Download, Sparkles, Loader2, Twitter, Instagram, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculateNumerologyData, getCompoundNumberInterpretation } from '@/utils/numerology';
 import {
@@ -51,7 +51,9 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
   const [, setCardGenerationError] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [includeName, setIncludeName] = useState(() => {
-    return localStorage.getItem('includeNameInEnergyCard') === 'true';
+    const stored = localStorage.getItem('includeNameInEnergyCard');
+    // Default to true if not set, otherwise respect stored preference
+    return stored === null ? true : stored === 'true';
   });
 
   const { name, birthDate } = userData;
@@ -169,7 +171,6 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           const MAX_CACHE_AGE = 1 * 60 * 60 * 1000; // 1 hour
 
           if (cacheAge < MAX_CACHE_AGE && imageUrl) {
-            console.log('Using cached energy card from localStorage (no loading spinner)');
             setEnergyCardUrl(imageUrl);
             return; // Skip generation entirely
           }
@@ -299,8 +300,8 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           });
           return;
         }
-      } catch (error) {
-        console.log('Web Share API with image failed:', error);
+      } catch {
+        // Web Share API with image failed, falling back
       }
     }
 
@@ -323,8 +324,8 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
         }, 300);
         return;
       }
-    } catch (clipboardError) {
-      console.log('Clipboard API failed:', clipboardError);
+    } catch {
+      // Clipboard API failed, falling back to download
     }
 
     // Final fallback: Download image + open Twitter
@@ -355,8 +356,8 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           title: 'My Current Energy',
           text: `My current energy: ${currentPeriodNumber} - "${currentPeriodTitle}" ✨`
         });
-      } catch (error) {
-        console.log('Share cancelled or failed');
+      } catch {
+        // Share cancelled or failed
       }
     } else {
       // Desktop or Web Share not available - download instead
@@ -434,13 +435,28 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           </p>
         </motion.div>
 
-        {/* Share and Download buttons - above card */}
+        {/* Controls row - checkbox on left, share/download on right */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="flex gap-3 justify-end mb-4"
+          className="flex items-center justify-between mb-4"
         >
+          {/* Include Name Checkbox - left side */}
+          <label className="flex items-center gap-2 cursor-pointer bg-black/40 px-4 py-2 rounded-lg border border-[#9B8DE3]/40 backdrop-blur-sm hover:bg-black/60 transition-colors">
+            <input
+              type="checkbox"
+              checked={includeName}
+              onChange={handleNameToggle}
+              className="w-4 h-4 rounded accent-[#9B8DE3]"
+            />
+            <span className="text-[#F4E8DC]/80 text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              {language === 'da' ? 'Inkluder mit navn i kortet' : 'Include my name in the card'}
+            </span>
+          </label>
+
+          {/* Share and Download buttons - right side */}
+          <div className="flex gap-3">
           <Button
             onClick={handleShare}
             disabled={isGeneratingImage}
@@ -462,6 +478,7 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
               <Download className="w-4 h-4" />
             )}
           </Button>
+          </div>
         </motion.div>
 
         {/* Shareable Card */}
@@ -469,8 +486,9 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           ref={cardRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          whileHover={{ boxShadow: '0 25px 50px -12px rgba(155, 141, 227, 0.4), 0 0 40px rgba(248, 161, 209, 0.2)' }}
           transition={{ duration: 0.6 }}
-          className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-[#9B8DE3]/40 rounded-3xl p-6 md:p-8 shadow-2xl mb-4"
+          className="glass-effect mystical-glow backdrop-blur-xl bg-gradient-to-br from-[#1D1B3A]/90 to-[#0C0A1E]/90 border-[#9B8DE3]/40 rounded-3xl p-6 md:p-8 shadow-2xl mb-4 transition-all"
         >
           {/* Header */}
           <div className="text-center mb-4">
@@ -523,7 +541,6 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
                     className="absolute inset-0 w-full h-full object-cover"
                     onError={() => {
                       // Image failed to load (expired URL), clear cache and fallback
-                      console.log('Energy card image failed to load, clearing cache');
                       const cacheKey = `energy_card_${currentPeriodNumber.replace('/', '_')}`;
                       localStorage.removeItem(cacheKey);
                       setEnergyCardUrl(null);
@@ -583,7 +600,7 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
             </div>
 
             {/* Description - shown below card */}
-            <p className="text-[#F4E8DC]/80 text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            <p className="text-[#F4E8DC]/90 text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               {shortDescription}
             </p>
 
@@ -596,7 +613,7 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
                   <span className="text-[#9B8DE3]/40">───</span>
                 </div>
                 <p
-                  className="text-[#F4E8DC]/80 text-base md:text-lg leading-relaxed italic px-4"
+                  className="text-[#F4E8DC]/90 text-base md:text-lg leading-relaxed italic px-4"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   "{actionTip}"
@@ -623,11 +640,47 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           </motion.div>
         )}
 
+        {/* Unlock Full Year Teaser */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#9B8DE3]/10 to-[#F8A1D1]/10 border border-[#9B8DE3]/20"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <CalendarDays className="w-5 h-5 text-[#9B8DE3]" />
+            <span
+              className="text-[#F4E8DC] text-sm font-semibold"
+              style={{ fontFamily: "'Cinzel', serif" }}
+            >
+              {language === 'da'
+                ? `Lås Op For Dit Fulde ${new Date().getFullYear()} Energikort`
+                : `Unlock Your Full ${new Date().getFullYear()} Energy Map`}
+            </span>
+          </div>
+          <p
+            className="text-[#F4E8DC]/60 text-xs mb-3 ml-8"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            {language === 'da'
+              ? 'Se alle kosmiske perioder for året — vid hvilken energi der kommer, før den ankommer.'
+              : 'See all cosmic periods for the year — know what energy is coming before it arrives.'}
+          </p>
+          <Button
+            disabled
+            className="w-full bg-gradient-to-r from-[#9B8DE3]/50 to-[#F8A1D1]/50 text-white/70 h-10 text-sm cursor-not-allowed"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <CalendarDays className="w-4 h-4 mr-2" />
+            {language === 'da' ? 'Kommer Snart' : 'Coming Soon'}
+          </Button>
+        </motion.div>
+
         {/* Complete Profile - Full width, emphasized */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.7 }}
           className="mb-6"
         >
           <Button
@@ -640,25 +693,6 @@ export default function CurrentEnergyPage({ userData }: CurrentEnergyPageProps) 
           </Button>
         </motion.div>
 
-        {/* Include Name Checkbox */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="flex justify-center"
-        >
-          <label className="flex items-center gap-3 cursor-pointer bg-black/40 px-6 py-3 rounded-xl border border-[#9B8DE3]/40 backdrop-blur-sm hover:bg-black/60 transition-colors">
-            <input
-              type="checkbox"
-              checked={includeName}
-              onChange={handleNameToggle}
-              className="w-5 h-5 rounded accent-[#9B8DE3]"
-            />
-            <span className="text-[#F4E8DC] text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
-              {language === 'da' ? 'Inkluder mit navn i kortet' : 'Include my name in the card'}
-            </span>
-          </label>
-        </motion.div>
       </div>
 
       {/* Share Modal */}

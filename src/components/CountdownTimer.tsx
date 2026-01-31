@@ -71,7 +71,7 @@ export function CountdownTimer({ targetDate, className = '' }: CountdownTimerPro
               {timeLeft.days.toString().padStart(2, '0')}
             </span>
           </div>
-          <span className="text-purple-300/60 text-xs mt-1">{t.days}</span>
+          <span className="text-purple-300/80 text-xs mt-1.5 bg-purple-900/30 px-2 py-0.5 rounded">{t.days}</span>
         </div>
 
         <span className="text-purple-400/60 text-xl font-light">:</span>
@@ -83,7 +83,7 @@ export function CountdownTimer({ targetDate, className = '' }: CountdownTimerPro
               {timeLeft.hours.toString().padStart(2, '0')}
             </span>
           </div>
-          <span className="text-purple-300/60 text-xs mt-1">{t.hours}</span>
+          <span className="text-purple-300/80 text-xs mt-1.5 bg-purple-900/30 px-2 py-0.5 rounded">{t.hours}</span>
         </div>
 
         <span className="text-purple-400/60 text-xl font-light">:</span>
@@ -95,7 +95,7 @@ export function CountdownTimer({ targetDate, className = '' }: CountdownTimerPro
               {timeLeft.minutes.toString().padStart(2, '0')}
             </span>
           </div>
-          <span className="text-purple-300/60 text-xs mt-1">{t.minutes}</span>
+          <span className="text-purple-300/80 text-xs mt-1.5 bg-purple-900/30 px-2 py-0.5 rounded">{t.minutes}</span>
         </div>
 
         <span className="text-purple-400/60 text-xl font-light hidden sm:inline">:</span>
@@ -107,7 +107,7 @@ export function CountdownTimer({ targetDate, className = '' }: CountdownTimerPro
               {timeLeft.seconds.toString().padStart(2, '0')}
             </span>
           </div>
-          <span className="text-purple-300/60 text-xs mt-1">{t.seconds}</span>
+          <span className="text-purple-300/80 text-xs mt-1.5 bg-purple-900/30 px-2 py-0.5 rounded">{t.seconds}</span>
         </div>
       </div>
     </div>

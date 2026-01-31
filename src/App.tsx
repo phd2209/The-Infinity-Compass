@@ -11,7 +11,7 @@ import CurrentEnergyPage from './pages/CurrentEnergyPage';
 import ShareableReadingPage from './pages/ShareableReadingPage';
 import NumerologyTestPage from './pages/NumerologyTestPage';
 import InfoPage from './pages/InfoPage';
-import YearForecastPage from './pages/YearForecastPage';
+// import YearForecastPage from './pages/YearForecastPage'; // Disabled until paid unlock is implemented
 import TalismanPage from './pages/TalismanPage';
 
 interface UserData {
@@ -145,8 +145,8 @@ function AppRoutes() {
         {/* Test page - accessible without authentication */}
         <Route path="/test" element={<NumerologyTestPage />} />
 
-        {/* Year Forecast page - accessible without authentication */}
-        <Route path="/forecast" element={<YearForecastPage />} />
+        {/* Year Forecast page - disabled until paid unlock is implemented
+        <Route path="/forecast" element={<YearForecastPage />} /> */}
 
         {/* Default route redirects to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />

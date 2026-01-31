@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star, Gem } from 'lucide-react';
+import { Share2, Download, Sparkles, Stars, Loader2, Twitter, Instagram, ChevronDown, Heart, Briefcase, TrendingUp, Star, Gem, ArrowLeft } from 'lucide-react';
 import { calculateNumerologyData, type NumerologyData } from '@/utils/numerology';
 import { generateNumerologySummary, type AISummary } from '@/services/aiService';
 import { useAuth } from '@/context/AuthContext';
@@ -42,7 +41,6 @@ export interface DiamondData extends NumerologyData {
 }
 
 export default function ShareableReadingPage({ userData, onBack }: ShareableReadingPageProps) {
-  const navigate = useNavigate();
   const { selectedNFT, userPath } = useAuth();
   const { language } = useLanguage();
   const [readingData, setReadingData] = useState<DiamondData | null>(null);
@@ -52,7 +50,9 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   const [showShareModal, setShowShareModal] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [includeName, setIncludeName] = useState(() => {
-    return localStorage.getItem('includeNameInReading') === 'true';
+    const stored = localStorage.getItem('includeNameInReading');
+    // Default to true if not set, otherwise respect stored preference
+    return stored === null ? true : stored === 'true';
   });
   const [showDeepDive, setShowDeepDive] = useState(false);
   const [showSacredCrystal, setShowSacredCrystal] = useState(false);
@@ -103,8 +103,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   };
 
   useEffect(() => {
-    console.log('ShareableReadingPage useEffect - userPath:', userPath);
-
     const currentKey = `${name}-${birthDate.toISOString()}-${userData.focusArea}`;
 
     if (initializationKey.current === currentKey) {
@@ -156,7 +154,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
     };
 
     const initializeReading = async () => {
-      console.log('initializeReading called - userPath:', userPath);
       const data = setupReadingData();
 
       try {
@@ -170,7 +167,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
             summary,
             timestamp: Date.now()
           }));
-          console.log('AI summary cached in localStorage');
         } catch {
           console.warn('Failed to cache AI summary (localStorage quota)');
         }
@@ -207,7 +203,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
         const MAX_CACHE_AGE = 24 * 60 * 60 * 1000; // 24 hours
 
         if (cacheAge < MAX_CACHE_AGE && summary) {
-          console.log('Using cached AI summary from localStorage (instant display)');
           // Set up reading data without API call
           setupReadingData();
           setAiSummary(summary);
@@ -235,13 +230,11 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
   const handleGenerateImage = async (): Promise<Blob | null> => {
     if (!cardRef.current) return null;
 
-    console.log('Starting image generation with html2canvas-pro...');
     setIsGeneratingImage(true);
 
     try {
       // Get the actual rendered dimensions
       const rect = cardRef.current.getBoundingClientRect();
-      console.log('Card dimensions:', rect.width, 'x', rect.height);
 
       // html2canvas-pro configuration - optimized for compatibility
       const canvas = await html2canvas(cardRef.current, {
@@ -269,8 +262,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
 
         // onclone callback - this is where we fix rendering issues
         onclone: (clonedDoc, clonedElement) => {
-          console.log('Processing cloned document for rendering...');
-
           if (!clonedElement) return;
 
           // Remove backdrop-blur effects that html2canvas can't handle
@@ -329,18 +320,13 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
             (cardElement as HTMLElement).style.opacity = '1';
             (cardElement as HTMLElement).style.visibility = 'visible';
           }
-
-          console.log('Cloned document processed successfully');
         }
       });
-
-      console.log('Canvas created successfully:', canvas.width, 'x', canvas.height);
 
       // Convert canvas to blob with maximum quality
       return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (blob) {
-            console.log('Blob created, size:', blob.size, 'bytes');
             resolve(blob);
           } else {
             reject(new Error('Failed to create blob from canvas'));
@@ -394,8 +380,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
           });
           return;
         }
-      } catch (error) {
-        console.log('Web Share API with image failed, falling back to clipboard:', error);
+      } catch {
+        // Web Share API failed, falling back to clipboard
       }
     }
 
@@ -423,8 +409,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
 
         return;
       }
-    } catch (clipboardError) {
-      console.log('Clipboard API failed:', clipboardError);
+    } catch {
+      // Clipboard API failed, fall through to download fallback
     }
 
     // Final fallback: Download image + open Twitter
@@ -457,8 +443,8 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
           title: 'My Infinity Compass Reading',
           text: `"${aiSummary?.oneLiner || 'Discover your cosmic blueprint'}" — My Infinity Compass reading ✨`
         });
-      } catch (error) {
-        console.log('Share cancelled or failed');
+      } catch {
+        // Share cancelled or failed - user closed share dialog
       }
     } else {
       // Desktop or Web Share not available - download instead
@@ -560,17 +546,32 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
       {/* Header controls */}
       <div className="max-w-2xl mx-auto mb-6 relative z-20">
         <div className="flex justify-between items-center">
-          {onBack && (
-            <Button
-              onClick={onBack}
-              variant="outline"
-              className="bg-black/40 border-[#9B8DE3]/40 text-[#F4E8DC] hover:bg-[#9B8DE3]/20"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
-            >
-              ← {language === 'da' ? 'Tilbage' : 'Back'}
-            </Button>
-          )}
-          <div className="flex gap-3 ml-auto">
+          {/* Left side: Back button + Include name checkbox */}
+          <div className="flex items-center gap-4">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="flex items-center gap-2 text-[#F4E8DC]/70 hover:text-[#F8A1D1] transition-colors group"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                <span className="text-sm">{language === 'da' ? 'Tilbage' : 'Back'}</span>
+              </button>
+            )}
+            <label className="flex items-center gap-2 cursor-pointer bg-black/40 px-4 py-2 rounded-lg border border-[#9B8DE3]/40 backdrop-blur-sm hover:bg-black/60 transition-colors">
+              <input
+                type="checkbox"
+                checked={includeName}
+                onChange={handleNameToggle}
+                className="w-4 h-4 rounded accent-[#9B8DE3]"
+              />
+              <span className="text-[#F4E8DC]/80 text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                {language === 'da' ? 'Inkluder mit navn i kortet' : 'Include my name in the card'}
+              </span>
+            </label>
+          </div>
+          {/* Right side: Share + Download buttons */}
+          <div className="flex gap-3">
             <Button
               onClick={handleShare}
               disabled={isGeneratingImage}
@@ -1191,12 +1192,12 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
                           className="flex justify-center pt-2"
                         >
                           <Button
-                            onClick={() => navigate('/talisman')}
-                            className="bg-gradient-to-r from-[#9B8DE3] to-[#F8A1D1] hover:from-[#8B7DD3] hover:to-[#E891C1] text-white px-8 py-3 rounded-xl shadow-lg shadow-[#9B8DE3]/30"
+                            disabled
+                            className="bg-gradient-to-r from-[#9B8DE3]/50 to-[#F8A1D1]/50 text-white/70 px-8 py-3 rounded-xl cursor-not-allowed"
                             style={{ fontFamily: "'Poppins', sans-serif" }}
                           >
                             <Gem className="w-4 h-4 mr-2" />
-                            {language === 'da' ? 'Gør Krav På Din Talisman' : 'Claim Your Talisman'}
+                            {language === 'da' ? 'Kommer Snart' : 'Coming Soon'}
                           </Button>
                         </motion.div>
 
@@ -1222,26 +1223,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
             )}
           </motion.div>
         </div>
-      </motion.div>
-
-      {/* Name toggle control */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="max-w-2xl mx-auto mt-6 flex justify-center relative z-20"
-      >
-        <label className="flex items-center gap-3 cursor-pointer bg-black/40 px-6 py-3 rounded-xl border border-[#9B8DE3]/40 backdrop-blur-sm hover:bg-black/60 transition-colors">
-          <input
-            type="checkbox"
-            checked={includeName}
-            onChange={handleNameToggle}
-            className="w-5 h-5 rounded accent-[#9B8DE3]"
-          />
-          <span className="text-[#F4E8DC] text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            {language === 'da' ? 'Inkluder mit navn i kortet' : 'Include my name in the card'}
-          </span>
-        </label>
       </motion.div>
 
       {/* Share Modal */}

@@ -94,6 +94,37 @@
     }
   }
 
+  /* Twinkle animation for sparkle/star icons */
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: drop-shadow(0 0 0 transparent);
+    }
+    25% {
+      opacity: 0.6;
+      transform: scale(0.9) rotate(-5deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.15) rotate(5deg);
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    75% {
+      opacity: 0.8;
+      transform: scale(0.95) rotate(-3deg);
+    }
+  }
+
+  .twinkle-on-hover {
+    transition: all 0.3s ease;
+  }
+
+  .twinkle-on-hover:hover,
+  .group:hover .twinkle-on-hover {
+    animation: twinkle 0.8s ease-in-out;
+  }
+
   /* Mystical theme for react-day-picker v9 */
   [data-slot="calendar"] {
     --cell-size: 2.75rem;

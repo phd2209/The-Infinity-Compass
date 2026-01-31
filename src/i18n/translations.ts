@@ -21,6 +21,7 @@ export interface Translations {
   btnLoginDiscord: string;
   btnSeeDemo: string;
   btnGenerateReading: string;
+  btnBack: string;
 
   // Privacy & Info
   privacyNote: string;
@@ -83,8 +84,8 @@ export const translations: Record<Language, Translations> = {
     // Features
     featurePersonalTitle: 'Personal Reading',
     featurePersonalDesc: 'Your unique numerology diamond chart based on your name and birth date',
-    featureYearTitle: 'Year Forecast',
-    featureYearDesc: 'Discover the cosmic periods shaping your year ahead',
+    featureYearTitle: 'Year Forecast (Coming Soon)',
+    featureYearDesc: 'Unlock your full year energy map — coming soon',
     featureShareableTitle: 'Shareable Card',
     featureShareableDesc: 'Generate beautiful cards to share on social media',
 
@@ -93,6 +94,7 @@ export const translations: Record<Language, Translations> = {
     btnLoginDiscord: 'Login with Discord',
     btnSeeDemo: 'See How It Works (no login)',
     btnGenerateReading: 'Generate My Reading',
+    btnBack: 'Back',
 
     // Privacy & Info
     privacyNote: 'Your reading data stays private and is never stored or shared',
@@ -154,8 +156,8 @@ export const translations: Record<Language, Translations> = {
     // Features
     featurePersonalTitle: 'Personlig Læsning',
     featurePersonalDesc: 'Dit unikke numerologi diamant kort baseret på dit navn og fødselsdato',
-    featureYearTitle: 'Års Prognose',
-    featureYearDesc: 'Opdag de kosmiske perioder der former dit kommende år',
+    featureYearTitle: 'Års Prognose (Kommer Snart)',
+    featureYearDesc: 'Lås op for dit fulde års energikort — kommer snart',
     featureShareableTitle: 'Delbar Kort',
     featureShareableDesc: 'Generer smukke kort til at dele på sociale medier',
 
@@ -164,6 +166,7 @@ export const translations: Record<Language, Translations> = {
     btnLoginDiscord: 'Log ind med Discord',
     btnSeeDemo: 'Se Hvordan Det Virker (ingen login)',
     btnGenerateReading: 'Generer Min Læsning',
+    btnBack: 'Tilbage',
 
     // Privacy & Info
     privacyNote: 'Dine læsningsdata forbliver private og bliver aldrig gemt eller delt',
