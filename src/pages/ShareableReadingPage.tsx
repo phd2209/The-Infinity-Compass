@@ -233,9 +233,6 @@ export default function ShareableReadingPage({ userData, onBack }: ShareableRead
     setIsGeneratingImage(true);
 
     try {
-      // Get the actual rendered dimensions
-      const rect = cardRef.current.getBoundingClientRect();
-
       // html2canvas-pro configuration - optimized for compatibility
       const canvas = await html2canvas(cardRef.current, {
         // High quality rendering

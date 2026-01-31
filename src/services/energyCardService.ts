@@ -13,7 +13,7 @@ export interface EnergyCardGenerationResult {
 const getEnergyVisualPrompt = (
   energyNumber: string,
   caption: string,
-  description: string
+  _description: string
 ): string => {
   // Extract the base number for visual mapping
   const baseNumber = parseInt(energyNumber.split('/')[0]) || parseInt(energyNumber);
